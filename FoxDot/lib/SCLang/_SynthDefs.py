@@ -403,6 +403,8 @@ dbass.add()
 
 sinepad = FileSynthDef("sinepad") 
 sinepad.add()
+evilbass = FileSynthDef('evilbass')
+evilbass.add()
 
 # Get rid of the variable synth
 
