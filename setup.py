@@ -15,6 +15,10 @@ setup(name='FoxDot',
       author_email='ryan@foxdot.org',
       license='cc-by-sa-4.0',
       url='http://foxdot.org/',
+      install_requires=[
+          'appdirs',
+          'requests'
+      ],
       packages=['FoxDot',
                 'FoxDot.lib',
                 'FoxDot.lib.Code',
