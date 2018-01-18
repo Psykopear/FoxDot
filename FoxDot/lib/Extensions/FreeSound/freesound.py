@@ -355,7 +355,7 @@ class Sound(FreesoundObject):
         try:
             self.path = os.path.join(
                 directory,
-                name if name else self.previews.preview_lq_mp3.split("/")[-1])
+                name if name else self.previews.preview_lq_ogg.split("/")[-1])
         except AttributeError:
             raise FreesoundException(
                 '-',
@@ -487,4 +487,3 @@ class Pack(FreesoundObject):
 
     def __repr__(self):
         return '<Pack:  name="%s">' % self.name
-

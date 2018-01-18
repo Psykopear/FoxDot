@@ -142,7 +142,8 @@ class Auth:
                 "client_secret": self.client_secret,
                 "grant_type": "refresh_token" if refresh else "authorization_code",
                 "code": code
-        })
+            }
+        )
         data = res.json()
         self.config.access_token = data['access_token']
         self.config.expire = datetime.now() + timedelta(seconds=data['expires_in'])
