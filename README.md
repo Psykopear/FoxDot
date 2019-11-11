@@ -14,6 +14,7 @@ Other than this, there are things I want to to that could be merged into the mai
 - I'd like to rename some synths to make clear their intended use (bass synths, lead synths, ecc). This is a consequence of the previous point, for example I would cut low frequencies in any synth not intended to be used as a bass
 - I don't need any of the GUI code since I use an external editor, so I would separate GUI code from the library as two separate packages, of which I would only maintain the library part
 - I'd like to start Supercollider from within FoxDot, so I don't have to fire up the instance separately
+- Remove python2 compatibility layer, since python2 is going to die [very soon](https://pythonclock.org) and the code adds complexity I don't want to deal with
 
 ## Changes
 - Apply Black formatter to the codebase for easier reading. I avoided using it on demos and in general wherever there is code used for performances, since I don't think it's useful there.

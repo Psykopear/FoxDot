@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 """
-
 FoxDot is a Python library and programming environment that provides a fast and
 user-friendly abstraction to the powerful audio-engine, SuperCollider. It comes
 with its own IDE, which means it can be used straight out of the box; all you need
@@ -18,6 +17,8 @@ Copyright Ryan Kirkbride 2015
 """
 
 from __future__ import absolute_import, division, print_function
+import os
+import subprocess
 
 try:
     import time
@@ -28,10 +29,6 @@ try:
     import platform
 except:
     print("Couldn't import platform library")
-
-import os
-
-import subprocess
 
 try:
     import psutil
