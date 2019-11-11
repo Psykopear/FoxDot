@@ -5,19 +5,21 @@ from __future__ import absolute_import, division, print_function
 try:
     import rtmidi
     from rtmidi import midiconstants
-    TIMING_CLOCK          = midiconstants.TIMING_CLOCK
+
+    TIMING_CLOCK = midiconstants.TIMING_CLOCK
     SONG_POSITION_POINTER = midiconstants.SONG_POSITION_POINTER
-    SONG_START            = midiconstants.SONG_START
-    SONG_STOP             = midiconstants.SONG_STOP 
+    SONG_START = midiconstants.SONG_START
+    SONG_STOP = midiconstants.SONG_STOP
 except ImportError as _err:
     pass
 
 from .Patterns import asStream
-from .Scale    import ScalePattern
-from .TimeVar  import TimeVar
+from .Scale import ScalePattern
+from .TimeVar import TimeVar
 from .SCLang import SynthDefProxy
 
 import time
+
 
 class MidiInputHandler(object):
 
@@ -34,25 +36,26 @@ class MidiInputHandler(object):
         datatype, delta = event
 
         self.midi_ctrl.delta += delta
-        
+
         if TIMING_CLOCK in datatype and not self.played:
 
             self.midi_ctrl.pulse += 1
-            
 
             if self.midi_ctrl.pulse == self.midi_ctrl.ppqn:
 
                 t_master = 60.0
-                
-                self.midi_ctrl.bpm = round(60.0 / self.midi_ctrl.delta,0)
+
+                self.midi_ctrl.bpm = round(60.0 / self.midi_ctrl.delta, 0)
 
                 self.midi_ctrl.pulse = 0
                 self.midi_ctrl.delta = 0.0
 
-                #print("BPM : " + repr(self.midi_ctrl.bpm))
-            
+                # print("BPM : " + repr(self.midi_ctrl.bpm))
+
+
 class MidiIn:
     metro = None
+
     def __init__(self, port_id=0):
         """ Class for listening for MIDI clock messages
             from a midi device """
@@ -77,12 +80,11 @@ class MidiIn:
         self.device.open_port(port_id)
         self.device.ignore_types(timing=False)
 
-
         self.pulse = 0
         self.delta = 0.0
-        self.bpm   = 120.0
-        self.ppqn  = 24
-        self.beat  = 0
+        self.bpm = 120.0
+        self.ppqn = 24
+        self.beat = 0
 
         self.device.set_callback(MidiInputHandler(self))
 
@@ -99,16 +101,20 @@ class MidiIn:
 
 class MidiOut(SynthDefProxy):
     """ SynthDef proxy for sending midi message via supercollider """
+
     def __init__(self, degree=0, **kwargs):
         SynthDefProxy.__init__(self, self.__class__.__name__, degree, kwargs)
 
-midi = MidiOut # experimental alias
+
+midi = MidiOut  # experimental alias
 
 # Midi information exceptions
+
 
 class MIDIDeviceNotFound(Exception):
     def __str__(self):
         return self.__class__.__name__ + " Error"
+
 
 class rtMidiNotFound(Exception):
     def __str__(self):

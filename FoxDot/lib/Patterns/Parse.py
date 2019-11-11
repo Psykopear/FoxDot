@@ -11,23 +11,25 @@ import re
 
 from .PlayString import *
 from .Generators import PRand
-from .PGroups    import PGroupMod, PGroupOr, PGroupStar, PGroupPlus
-from .Main       import Pattern, metaPattern, PatternMethod, PGroup, GeneratorPattern
+from .PGroups import PGroupMod, PGroupOr, PGroupStar, PGroupPlus
+from .Main import Pattern, metaPattern, PatternMethod, PGroup, GeneratorPattern
 
 from ..Utils import modi, LCM
 
-re_nests  = r"\((.*?)\)"
+re_nests = r"\((.*?)\)"
 re_square = r"\[.*?\]"
-re_curly  = r"\{.*?\}"
-re_arrow  = r"<.*?>"
+re_curly = r"\{.*?\}"
+re_arrow = r"<.*?>"
 square_type = PGroupPlus
 braces_type = PRand
-bar_type    = PGroupOr
+bar_type = PGroupOr
+
 
 def ParsePlayString(string, flat=False):
     """ Returns the parsed play string used by sample player """
     output, _ = feed(string)
     return output
+
 
 def convert_to_int(data):
     """ Recursively calls until all nested data contains only integers """
@@ -41,6 +43,7 @@ def convert_to_int(data):
         return data.convert_data(convert_to_int)
     return int(data)
 
+
 def arrow_zip(pat1, pat2):
     """ Zips two patterns together. If one item is a tuple, it extends the tuple / PGroup
         i.e. arrow_zip([(0,1),3], [2]) -> [(0,1,2),(3,2)]
@@ -52,7 +55,7 @@ def arrow_zip(pat1, pat2):
         item1 = pat1.getitem(i, get_generator=True)
         item2 = pat2.getitem(i, get_generator=True)
 
-        if all([x.__class__== PGroup for x in (item1, item2)]):
+        if all([x.__class__ == PGroup for x in (item1, item2)]):
 
             new_item = PGroup(item1.data + item2.data)
 
@@ -72,18 +75,19 @@ def arrow_zip(pat1, pat2):
 
     return output
 
+
 def feed(string):
     """ Used to recursively parse nested strings, returns a list object (not Pattern),
         and a boolean denoting if the list contains a nested list """
-    
+
     string = PlayString(string)
-    items  = [] # The actual pattern
+    items = []  # The actual pattern
 
     layer_pattern = False
     contains_nest = False
-    
+
     i = 0
-    
+
     while i < len(string):
 
         char = string[i]
@@ -92,8 +96,8 @@ def feed(string):
         if char == "<":
 
             # Parse the contents of the brackets if found
-            j = string.index(">", start=i+1)
-            s = string[i+1:j]
+            j = string.index(">", start=i + 1)
+            s = string[i + 1 : j]
             i = j
 
             chars, _ = feed(s)
@@ -108,7 +112,7 @@ def feed(string):
 
             if layer_pattern:
 
-                items[-1] = items[-1].zip( Pattern(chars) )
+                items[-1] = items[-1].zip(Pattern(chars))
 
             else:
 
@@ -123,8 +127,8 @@ def feed(string):
         elif char == "|":
 
             # Parse the contents of the brackets if found
-            j = string.next_char_index("|", start=i+1)
-            s = string[i+1:j]
+            j = string.next_char_index("|", start=i + 1)
+            s = string[i + 1 : j]
             i = j
 
             chars, _ = feed(s)
@@ -137,7 +141,7 @@ def feed(string):
 
             try:
 
-                assert(len(chars) == 2)
+                assert len(chars) == 2
 
             except AssertionError:
 
@@ -146,7 +150,7 @@ def feed(string):
                 raise ParseError(e)
 
             # First is our list of sample chars
-            
+
             samp_chr = chars[0]
 
             # Next is a list of integers for sample kw
@@ -161,9 +165,9 @@ def feed(string):
         elif char == "(":
 
             # Parse the contents of the brackets if found
-            j = string.index(")", start=i+1)
-            
-            s = string[i+1:j]
+            j = string.index(")", start=i + 1)
+
+            s = string[i + 1 : j]
             i = j
 
             chars, _ = feed(s)
@@ -174,7 +178,7 @@ def feed(string):
 
                 raise ParseError(e)
 
-            items.append( chars ) # add the nested list
+            items.append(chars)  # add the nested list
 
             layer_pattern = False
 
@@ -184,8 +188,8 @@ def feed(string):
         elif char == "{":
 
             # Parse the contents of the brackets if found
-            j = string.index("}", start=i+1)
-            s = string[i+1:j]
+            j = string.index("}", start=i + 1)
+            s = string[i + 1 : j]
             i = j
 
             chars, _ = feed(s)
@@ -196,15 +200,15 @@ def feed(string):
 
                 raise ParseError(e)
 
-            items.append( braces_type(chars) )
+            items.append(braces_type(chars))
 
             layer_pattern = False
-                
+
         # Look for a '[]'
         elif char == "[":
-            
-            j = string.index("]", start=i+1)
-            s = string[i+1:j]
+
+            j = string.index("]", start=i + 1)
+            s = string[i + 1 : j]
             i = j
 
             chars, contains_nest = feed(s)
@@ -228,7 +232,7 @@ def feed(string):
 
                     new_chars.append(square_type([modi(ch, num) for ch in chars]))
 
-                items.append( new_chars )
+                items.append(new_chars)
 
                 layer_pattern = False
 
@@ -240,7 +244,7 @@ def feed(string):
 
                     new_chars.append(char)
 
-                items.append( square_type(new_chars) )
+                items.append(square_type(new_chars))
 
                 layer_pattern = False
 
@@ -248,7 +252,7 @@ def feed(string):
 
         elif char not in ")]}>|":
 
-            items.append( char )
+            items.append(char)
 
             layer_pattern = False
 

@@ -7,12 +7,14 @@ from .AppFunctions import index as get_index
 from .Format import get_keywords
 import re
 
+
 class TextPrompt:
     num_items = 6
     pady = 2
+
     def __init__(self, root):
         self.root = root
-        self.master = self.root.text # text box
+        self.master = self.root.text  # text box
 
         # TODO // sort out the name space to check for suggestions
 
@@ -24,12 +26,34 @@ class TextPrompt:
         scales = list(self.root.namespace["Scale"].names())
         other = ["SynthDefs"]
 
-        self.namespace = sorted(list(set(keywords + synthdefs + attributes + player_methods + pattern_methods + scales + other)))
+        self.namespace = sorted(
+            list(
+                set(
+                    keywords
+                    + synthdefs
+                    + attributes
+                    + player_methods
+                    + pattern_methods
+                    + scales
+                    + other
+                )
+            )
+        )
 
         self.values = [StringVar() for n in range(self.num_items)]
         self.clear()
-        
-        self.labels = [Label(self.master, textvariable=self.values[n], font="CodeFont", foreground="White", anchor=NW, pady=self.pady) for n in range(self.num_items)]
+
+        self.labels = [
+            Label(
+                self.master,
+                textvariable=self.values[n],
+                font="CodeFont",
+                foreground="White",
+                anchor=NW,
+                pady=self.pady,
+            )
+            for n in range(self.num_items)
+        ]
 
         self.selected = 0
         self.bg = "gray40"
@@ -41,7 +65,7 @@ class TextPrompt:
         self.y = 0
         self.w = 0
         self.h = 0
-        
+
         self.re = re.compile(r"(\w+)$")
 
         self.__visible = True
@@ -80,7 +104,7 @@ class TextPrompt:
 
     def show(self):
         """ Displays the prompt with suggestions """
-        
+
         if not self.__visible:
 
             return
@@ -94,13 +118,13 @@ class TextPrompt:
         if len(word) == 0 or self.in_word():
 
             return self.hide()
-        
+
         bbox = self.master.bbox(index)
-        
+
         if bbox is not None:
 
             self.selected = 0
-        
+
             self.x, self.y, self.w, self.h = bbox
 
             # 3. Find first 4 words
@@ -111,7 +135,9 @@ class TextPrompt:
 
             num_suggestions = len(self.suggestions)
 
-            if num_suggestions == 0 or (num_suggestions == 1 and (word == self.suggestions[0])):
+            if num_suggestions == 0 or (
+                num_suggestions == 1 and (word == self.suggestions[0])
+            ):
 
                 return self.hide()
 
@@ -124,19 +150,21 @@ class TextPrompt:
             self.visible = True
 
         return
-    
+
     def move(self, x, y):
         offset = self.h
-        width  = max((len(val.get()) for val in self.values))
+        width = max((len(val.get()) for val in self.values))
         for i, label in enumerate(self.labels):
             if self.values[i].get() != "":
                 label.place(x=x, y=y + offset)
-                label.config(width=width, bg=(self.fg if self.selected == i else self.bg),)
-                offset += (self.h + (self.pady * 2))
+                label.config(
+                    width=width, bg=(self.fg if self.selected == i else self.bg)
+                )
+                offset += self.h + (self.pady * 2)
             else:
                 label.place(x=9999, y=9999)
         return
-    
+
     def hide(self):
         self.clear()
         self.move(x=9999, y=9999)
@@ -150,10 +178,10 @@ class TextPrompt:
 
     def update_values(self, values):
         self.clear()
-        for i, word in enumerate(values[:self.num_items]):
+        for i, word in enumerate(values[: self.num_items]):
             self.values[i].set(word)
         return
-    
+
     def find_suggestions(self, word):
         words = []
         i = 0
@@ -178,11 +206,11 @@ class TextPrompt:
         if self.anchor is not None:
             LENGTH = self.anchor[1] - self.anchor[0]
             self.master.delete("{}-{}c".format(INSERT, LENGTH), INSERT)
-            WORD  = self.values[self.selected].get()
+            WORD = self.values[self.selected].get()
             self.master.insert(INSERT, WORD)
             self.root.update()
         self.hide()
-        return 
+        return
 
     def toggle(self):
         """ Flags the prompt to show / not show automatically """

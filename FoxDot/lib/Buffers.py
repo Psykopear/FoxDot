@@ -28,76 +28,114 @@ from .ServerManager import Server
 from .Settings import FOXDOT_SND, FOXDOT_LOOP
 
 
-alpha    = "abcdefghijklmnopqrstuvwxyz"
+alpha = "abcdefghijklmnopqrstuvwxyz"
 
-nonalpha = {"&" : "ampersand",
-            "*" : "asterix",
-            "@" : "at",
-            "^" : "caret",
-            ":" : "colon",
-            "$" : "dollar",
-            "=" : "equals",
-            "!" : "exclamation",
-            "/" : "forwardslash",
-            "#" : "hash",
-            "-" : "hyphen",
-            "%" : "percent",
-            "+" : "plus",
-            "?" : "question",
-            "~" : "tilde",
-            "\\" :"backslash",
-            "1" : "1",
-            "2" : "2",
-            "3" : "3",
-            "4" : "4" }
+nonalpha = {
+    "&": "ampersand",
+    "*": "asterix",
+    "@": "at",
+    "^": "caret",
+    ":": "colon",
+    "$": "dollar",
+    "=": "equals",
+    "!": "exclamation",
+    "/": "forwardslash",
+    "#": "hash",
+    "-": "hyphen",
+    "%": "percent",
+    "+": "plus",
+    "?": "question",
+    "~": "tilde",
+    "\\": "backslash",
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+}
 
-DESCRIPTIONS = { 'a' : "Gameboy hihat",      'A' : "Gameboy kick drum",
-                 'b' : "Noisy beep",         'B' : "Short saw",
-                 'c' : "Voice/string",       'C' : "Choral",
-                 'd' : "Woodblock",          'D' : "Dirty snare",
-                 'e' : "Electronic Cowbell", 'E' : "Ringing percussion",
-                 'f' : "Pops",               'F' : "Trumpet stabs",
-                 'g' : "Ominous",            'G' : "Ambient stabs",
-                 'h' : "Finger snaps",       'H' : "Clap",
-                 'i' : "Jungle snare",       'I' : "Rock snare",
-                 'j' : "Whines",             'J' : "Ambient stabs",
-                 'k' : "Wood shaker",        'K' : "Percussive hits",
-                 'l' : "Robot noise",        'L' : "Noisy percussive hits",
-                 'm' : "808 toms",           'M' : "Acoustic toms",
-                 'n' : "Noise",              'N' : "Gameboy SFX",
-                 'o' : "Snare drum",         'O' : "Heavy snare",
-                 'p' : "Tabla",              'P' : "Tabla long",
-                 'q' : "Ambient stabs",      'Q' : "Electronic stabs",
-                 'r' : "Metal",              'R' : "Metallic",
-                 's' : "Shaker",             'S' : "Tamborine",
-                 't' : "Rimshot",            'T' : "Cowbell",
-                 'u' : "Soft snare",         'U' : "Misc. Fx",
-                 'v' : "Soft kick",          'V' : "Hard kick",
-                 'w' : "Dub hits",           'W' : "Distorted",
-                 'x' : "Bass drum",          'X' : "Heavy kick",
-                 'y' : "Percussive hits",    'Y' : "High buzz",
-                 'z' : "Scratch",            "Z" : "Loud stabs",
-                 '-' : "Hi hat closed",      "|" : "Hangdrum",
-                 '=' : "Hi hat open",        "/" : "Reverse sounds",
-                 '*' : "Clap",               "\\" : "Lazer",
-                 '~' : "Ride cymbal",        "%" : "Noise bursts",
-                 '^' : "'Donk'",             "$" : "Beatbox",
-                 '#' : "Crash",              "!" : "Yeah!",
-                 '+' : "Clicks",             "&" : "Chime",
-                 '@' : "Gameboy noise",      ":" : "Hi-hats",
-                 '1' : "Vocals (One)",
-                 '2' : 'Vocals (Two)',
-                 '3' : 'Vocals (Three)',
-                 '4' : 'Vocals (Four)'}
+DESCRIPTIONS = {
+    "a": "Gameboy hihat",
+    "A": "Gameboy kick drum",
+    "b": "Noisy beep",
+    "B": "Short saw",
+    "c": "Voice/string",
+    "C": "Choral",
+    "d": "Woodblock",
+    "D": "Dirty snare",
+    "e": "Electronic Cowbell",
+    "E": "Ringing percussion",
+    "f": "Pops",
+    "F": "Trumpet stabs",
+    "g": "Ominous",
+    "G": "Ambient stabs",
+    "h": "Finger snaps",
+    "H": "Clap",
+    "i": "Jungle snare",
+    "I": "Rock snare",
+    "j": "Whines",
+    "J": "Ambient stabs",
+    "k": "Wood shaker",
+    "K": "Percussive hits",
+    "l": "Robot noise",
+    "L": "Noisy percussive hits",
+    "m": "808 toms",
+    "M": "Acoustic toms",
+    "n": "Noise",
+    "N": "Gameboy SFX",
+    "o": "Snare drum",
+    "O": "Heavy snare",
+    "p": "Tabla",
+    "P": "Tabla long",
+    "q": "Ambient stabs",
+    "Q": "Electronic stabs",
+    "r": "Metal",
+    "R": "Metallic",
+    "s": "Shaker",
+    "S": "Tamborine",
+    "t": "Rimshot",
+    "T": "Cowbell",
+    "u": "Soft snare",
+    "U": "Misc. Fx",
+    "v": "Soft kick",
+    "V": "Hard kick",
+    "w": "Dub hits",
+    "W": "Distorted",
+    "x": "Bass drum",
+    "X": "Heavy kick",
+    "y": "Percussive hits",
+    "Y": "High buzz",
+    "z": "Scratch",
+    "Z": "Loud stabs",
+    "-": "Hi hat closed",
+    "|": "Hangdrum",
+    "=": "Hi hat open",
+    "/": "Reverse sounds",
+    "*": "Clap",
+    "\\": "Lazer",
+    "~": "Ride cymbal",
+    "%": "Noise bursts",
+    "^": "'Donk'",
+    "$": "Beatbox",
+    "#": "Crash",
+    "!": "Yeah!",
+    "+": "Clicks",
+    "&": "Chime",
+    "@": "Gameboy noise",
+    ":": "Hi-hats",
+    "1": "Vocals (One)",
+    "2": "Vocals (Two)",
+    "3": "Vocals (Three)",
+    "4": "Vocals (Four)",
+}
 
 # Function-like class for searching directory for sample based on symbol
 
+
 class _symbolToDir:
-    
     def __init__(self, root):
-    
+
         self.set_root(root)
-    
+
     def set_root(self, root):
         """ Check if root is a valid directory then points FoxDot to that
             folder for searching for samples. Raises an OSError if 'root'
@@ -113,22 +151,22 @@ class _symbolToDir:
         """ Return the sample search directory for a symbol """
         if symbol.isalpha():
             return join(
-                self.root,
-                symbol.lower(),
-                'upper' if symbol.isupper() else 'lower'
+                self.root, symbol.lower(), "upper" if symbol.isupper() else "lower"
             )
         elif symbol in nonalpha:
             longname = nonalpha[symbol]
-            return join(self.root, '_', longname)
+            return join(self.root, "_", longname)
         else:
             return None
 
-symbolToDir = _symbolToDir(FOXDOT_SND) # singleton
+
+symbolToDir = _symbolToDir(FOXDOT_SND)  # singleton
+
 
 class Buffer(object):
     def __init__(self, fn, number, channels=1):
         self.fn = fn
-        self.bufnum   = int(number)
+        self.bufnum = int(number)
         self.channels = channels
 
     def __repr__(self):
@@ -147,7 +185,7 @@ class Buffer(object):
         return cls(filename, number, numChannels)
 
 
-nil = Buffer('', 0)
+nil = Buffer("", 0)
 
 
 class BufferManager(object):
@@ -159,15 +197,15 @@ class BufferManager(object):
         self._buffers = [None for _ in range(self._max_buffers)]
         self._fn_to_buf = {}
         self._paths = [FOXDOT_LOOP] + list(paths)
-        self._ext = ['wav', 'wave', 'aif', 'aiff', 'flac']
+        self._ext = ["wav", "wave", "aif", "aiff", "flac"]
 
-        self.loops = [fn.rsplit(".",1)[0] for fn in os.listdir(FOXDOT_LOOP)]
+        self.loops = [fn.rsplit(".", 1)[0] for fn in os.listdir(FOXDOT_LOOP)]
 
     def __str__(self):
         return "\n".join(["%r: %s" % (k, v) for k, v in sorted(DESCRIPTIONS.items())])
 
     def __repr__(self):
-        return '<BufferManager>'
+        return "<BufferManager>"
 
     def __getitem__(self, key):
         """ Short-hand access for getBufferFromSymbol() i.e. Samples['x'] """
@@ -283,7 +321,7 @@ class BufferManager(object):
             for ext in self._ext:
                 # Look for .wav and .WAV
                 for tryext in [ext, ext.upper()]:
-                    extpath = filename + '.' + tryext
+                    extpath = filename + "." + tryext
                     if isfile(extpath):
                         return extpath
         return None
@@ -339,7 +377,7 @@ class BufferManager(object):
         def _findNextSubpaths(path, pattern):
             """ For a path pattern, find all subpaths that match """
             # ** is a special case meaning "all recursive directories"
-            if pattern == '**':
+            if pattern == "**":
                 for dirpath, _, _ in os.walk(path):
                     yield dirpath
             else:
@@ -353,9 +391,9 @@ class BufferManager(object):
         filepat = subpaths.pop()
         while subpaths:
             subpath = subpaths.pop(0)
-            queue = list(chain.from_iterable(
-                (_findNextSubpaths(p, subpath) for p in queue)
-            ))
+            queue = list(
+                chain.from_iterable((_findNextSubpaths(p, subpath) for p in queue))
+            )
 
         # If the filepat (ex. 'foo*.wav') has an extension, we want to match
         # the full filename. If not, we just match against the basename.
@@ -380,7 +418,7 @@ class BufferManager(object):
             return candidates[index % len(candidates)]
         return None
 
-    @Timing('bufferSearch', logargs=True)
+    @Timing("bufferSearch", logargs=True)
     def _findSample(self, filename, index=0):
         """
         Find a sample from a filename or pattern
@@ -437,47 +475,67 @@ class LoopSynthDef(SampleSynthDef):
         self.pos = self.new_attr_instance("pos")
         self.sample = self.new_attr_instance("sample")
         self.beat_stretch = self.new_attr_instance("beat_stretch")
-        self.defaults['pos']   = 0
-        self.defaults['sample']   = 0
-        self.defaults['beat_stretch'] = 0
-        self.base.append("rate = (rate * (1-(beat_stretch>0))) + ((BufDur.kr(buf) / sus) * (beat_stretch>0));")
-        self.base.append("osc = PlayBuf.ar(2, buf, BufRateScale.kr(buf) * rate, startPos: BufSampleRate.kr(buf) * pos, loop: 1.0);")
-        self.base.append("osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));")
+        self.defaults["pos"] = 0
+        self.defaults["sample"] = 0
+        self.defaults["beat_stretch"] = 0
+        self.base.append(
+            "rate = (rate * (1-(beat_stretch>0))) + ((BufDur.kr(buf) / sus) * (beat_stretch>0));"
+        )
+        self.base.append(
+            "osc = PlayBuf.ar(2, buf, BufRateScale.kr(buf) * rate, startPos: BufSampleRate.kr(buf) * pos, loop: 1.0);"
+        )
+        self.base.append(
+            "osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));"
+        )
         self.osc = self.osc * self.amp
         self.add()
+
     def __call__(self, filename, pos=0, sample=0, **kwargs):
         kwargs["buf"] = Samples.loadBuffer(filename, sample)
         proxy = SampleSynthDef.__call__(self, pos, **kwargs)
         proxy.kwargs["filename"] = filename
         return proxy
 
+
 class StretchSynthDef(SampleSynthDef):
     def __init__(self):
         SampleSynthDef.__init__(self, "stretch")
-        self.base.append("osc = Warp1.ar(2, buf, Line.kr(0,1,sus), rate, windowSize: 0.2, overlaps: 4, interp:2);")
-        self.base.append("osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));")
+        self.base.append(
+            "osc = Warp1.ar(2, buf, Line.kr(0,1,sus), rate, windowSize: 0.2, overlaps: 4, interp:2);"
+        )
+        self.base.append(
+            "osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));"
+        )
         self.osc = self.osc * self.amp
         self.add()
+
     def __call__(self, filename, pos=0, sample=0, **kwargs):
         kwargs["buf"] = Samples.loadBuffer(filename, sample)
         proxy = SampleSynthDef.__call__(self, pos, **kwargs)
         proxy.kwargs["filename"] = filename
         return proxy
+
 
 class GranularSynthDef(SampleSynthDef):
     def __init__(self):
         SampleSynthDef.__init__(self, "gsynth")
         self.pos = self.new_attr_instance("pos")
         self.sample = self.new_attr_instance("sample")
-        self.defaults['pos']   = 0
-        self.defaults['sample']   = 0
-        self.base.append("osc = PlayBuf.ar(2, buf, BufRateScale.kr(buf) * rate, startPos: BufSampleRate.kr(buf) * pos);")
-        self.base.append("osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));")
+        self.defaults["pos"] = 0
+        self.defaults["sample"] = 0
+        self.base.append(
+            "osc = PlayBuf.ar(2, buf, BufRateScale.kr(buf) * rate, startPos: BufSampleRate.kr(buf) * pos);"
+        )
+        self.base.append(
+            "osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));"
+        )
         self.osc = self.osc * self.amp
         self.add()
+
     def __call__(self, filename, pos=0, sample=0, **kwargs):
         kwargs["buf"] = Samples.loadBuffer(filename, sample)
         return SampleSynthDef.__call__(self, pos, **kwargs)
+
 
 loop = LoopSynthDef()
 stretch = StretchSynthDef()

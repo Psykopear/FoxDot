@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 from ..ServerManager import BidirectionalOSCServer, OSCMessage
 
+
 class EspGrid:
     def __init__(self, address=("localhost", 5510), clock=None):
 
@@ -10,8 +11,8 @@ class EspGrid:
 
         self.server = BidirectionalOSCServer(("0.0.0.0", 0))
         self.server.connect(self.server_address)
-        
-        self.server.addMsgHandler('/reset', self._reset_clock)
+
+        self.server.addMsgHandler("/reset", self._reset_clock)
 
     def __repr__(self):
         return self.__class__.__name__
@@ -117,4 +118,3 @@ class EspGrid:
     # Receiving
     def recv(self, pattern):
         return self.server.receive(pattern)
-

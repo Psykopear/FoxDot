@@ -19,6 +19,7 @@ Copyright Ryan Kirkbride 2015
 
 from __future__ import absolute_import, division, print_function
 
+
 def boot_supercollider():
     """ Uses subprocesses to boot supercollider from the cli """
 
@@ -33,11 +34,12 @@ def boot_supercollider():
     except ImportError:
         os.system("pip install psutil")
         import sys
+
         sys.exit("Installed psutil, please start FoxDot again.")
 
-    sclangpath = "" #find path to sclang
+    sclangpath = ""  # find path to sclang
 
-    thispath = "" #find this path
+    thispath = ""  # find this path
 
     thisdir = os.getcwd()
 
@@ -45,7 +47,7 @@ def boot_supercollider():
 
     username = getpass.getuser()
 
-    if(OS == "Windows"):
+    if OS == "Windows":
 
         print("OS: Windows")
 
@@ -53,51 +55,54 @@ def boot_supercollider():
 
         thiscwd = str(sclangloc)
 
-        ourcwd = thiscwd.replace('\\sclang.exe\n', '')
+        ourcwd = thiscwd.replace("\\sclang.exe\n", "")
 
         def is_proc_running(name):
             for p in psutil.process_iter(attrs=["name", "exe", "cmdline"]):
-                #print(p);
-                procname = p.info['name'] or \
-                     p.info['exe'] and os.path.basename(p.info['exe']) == name or \
-                     p.info['cmdline'] and p.info['cmdline'][0] == name
-                if(procname.startswith(name)):
+                # print(p);
+                procname = (
+                    p.info["name"]
+                    or p.info["exe"]
+                    and os.path.basename(p.info["exe"]) == name
+                    or p.info["cmdline"]
+                    and p.info["cmdline"][0] == name
+                )
+                if procname.startswith(name):
                     return True
             return False
 
+        running = is_proc_running("sclang")
 
-        running = (is_proc_running("sclang"))
-
-        if(running == False):
-            startup = thisdir+"/FoxDot/startup.scd"
-            #os.system("sclang"+startup+" &")
+        if running == False:
+            startup = thisdir + "/FoxDot/startup.scd"
+            # os.system("sclang"+startup+" &")
             subprocess.Popen([sclangloc, startup], cwd=ourcwd, shell=True)
 
-    elif(OS == "Linux"):
+    elif OS == "Linux":
 
         print("OS: Linux")
 
         def is_proc_running(name):
-            for p in psutil.process_iter(attrs=["name","cmdline"]):
-                #print(p);
-                procname = p.info['name'] or \
-                     p.info['cmdline'] and p.info['cmdline'][0] == name
-                if(procname.startswith(name)):
+            for p in psutil.process_iter(attrs=["name", "cmdline"]):
+                # print(p);
+                procname = (
+                    p.info["name"] or p.info["cmdline"] and p.info["cmdline"][0] == name
+                )
+                if procname.startswith(name):
                     return True
 
+        running = is_proc_running("sclang")
 
-        running = (is_proc_running("sclang"))
-
-        if(running == False):
-            startup = thisdir+"/FoxDot/startup.scd"
-            #os.system('sclang "/home/foxdot/Desktop/FoxDot-Cross-Platform/FoxDot/startup.scd" &') #fuctional
-            os.system("sclang "+startup+" &")
-
+        if running == False:
+            startup = thisdir + "/FoxDot/startup.scd"
+            # os.system('sclang "/home/foxdot/Desktop/FoxDot-Cross-Platform/FoxDot/startup.scd" &') #fuctional
+            os.system("sclang " + startup + " &")
 
     else:
         print("Operating system unrecognised")
-        #Potentially get the user to choose their OS from a list?
-        #Then run the corresponding functions
+        # Potentially get the user to choose their OS from a list?
+        # Then run the corresponding functions
+
 
 import sys
 
@@ -109,15 +114,18 @@ if "--boot" in sys.argv:
 
 from .lib import *
 
+
 def main():
     """ Function for starting the GUI when importing the library """
     FoxDot = Workspace.workspace(FoxDotCode).run()
+
 
 def Go():
     """ Function to be called at the end of Python files with FoxDot code in to keep
         the TempoClock thread alive. """
     try:
         import time
+
         while 1:
             time.sleep(100)
     except KeyboardInterrupt:

@@ -1,5 +1,6 @@
 import wx
 
+
 class Menu(wx.MenuBar):
     def __init__(self, parent):
         wx.MenuBar.__init__(self)
@@ -10,9 +11,11 @@ class Menu(wx.MenuBar):
 
         self.filemenu = wx.Menu()
         save_item = self.filemenu.Append(wx.ID_SAVE, "&Save", "Save your work")
-        open_item = self.filemenu.Append(wx.ID_OPEN, "&Open", "Open a file in the editor")
+        open_item = self.filemenu.Append(
+            wx.ID_OPEN, "&Open", "Open a file in the editor"
+        )
         self.filemenu.AppendSeparator()
-        exit_item  = self.filemenu.Append(wx.ID_EXIT,"E&xit"," Clock the program")
+        exit_item = self.filemenu.Append(wx.ID_EXIT, "E&xit", " Clock the program")
 
         self.parent.Bind(wx.EVT_MENU, self.OnSave, save_item)
         self.parent.Bind(wx.EVT_MENU, self.OnOpen, open_item)

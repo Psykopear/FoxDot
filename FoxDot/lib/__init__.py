@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 import os.path
+
 with open((os.path.join(os.path.dirname(__file__), ".version")), "r") as f:
     __version__ = f.read()
 
@@ -30,7 +31,8 @@ from .Workspace import get_keywords
 from random import choice as choose
 
 # Define any custom functions
-    
+
+
 @PatternMethod
 def __getitem__(self, key):
     """ Overrides the Pattern.__getitem__ to allow indexing
@@ -47,6 +49,7 @@ def __getitem__(self, key):
     else:
         return self.getitem(key)
 
+
 def player_method(f):
     """ Decorator for assigning functions as Player methods. 
 
@@ -59,24 +62,31 @@ def player_method(f):
     setattr(Player, f.__name__, f)
     return getattr(Player, f.__name__)
 
-PlayerMethod = player_method # Temporary alias
+
+PlayerMethod = player_method  # Temporary alias
+
 
 def _futureBarDecorator(n, multiplier=1):
     if callable(n):
+
         def switch(*args, **kwargs):
             Clock.now_flag = True
             output = n()
             Clock.now_flag = False
             return output
+
         Clock.schedule(switch, Clock.next_bar())
         return switch
+
     def wrapper(f):
         Clock.schedule(f, Clock.next_bar() + (n * multiplier))
         return f
+
     return wrapper
 
+
 def next_bar(n=0):
-    ''' Schedule functions when you define them with @nextBar
+    """ Schedule functions when you define them with @nextBar
     Functions will run n beats into the next bar.
 
     >>> nextBar(v1.solo)
@@ -84,13 +94,15 @@ def next_bar(n=0):
     >>> @nextBar
     ... def dostuff():
     ...     v1.solo()
-    '''
+    """
     return _futureBarDecorator(n)
 
-nextBar = next_bar # temporary alias
+
+nextBar = next_bar  # temporary alias
+
 
 def futureBar(n=0):
-    ''' Schedule functions when you define them with @futureBar
+    """ Schedule functions when you define them with @futureBar
     Functions will run n bars in the future (0 is the next bar)
 
     >>> futureBar(v1.solo)
@@ -98,8 +110,9 @@ def futureBar(n=0):
     >>> @futureBar(4)
     ... def dostuff():
     ...     v1.solo()
-    '''
+    """
     return _futureBarDecorator(n, Clock.bar_length())
+
 
 def update_foxdot_clock(clock):
     """ Tells the TimeVar, Player, and MidiIn classes to use 
@@ -115,6 +128,7 @@ def update_foxdot_clock(clock):
 
     return
 
+
 def update_foxdot_server(serv):
     """ Tells the `Effect` and`TempoClock`classes to send OSC messages to
         a new ServerManager instance.
@@ -127,10 +141,11 @@ def update_foxdot_server(serv):
 
     return
 
+
 def instantiate_player_objects():
     """ Instantiates all two-character variable Player Objects """
-    alphabet = list('abcdefghijklmnopqrstuvwxyz')
-    numbers  = list('0123456789')
+    alphabet = list("abcdefghijklmnopqrstuvwxyz")
+    numbers = list("0123456789")
 
     for char1 in alphabet:
 
@@ -144,19 +159,24 @@ def instantiate_player_objects():
 
             group.append(arg)
 
-        FoxDotCode.namespace[char1 + "_all"] = Group(*[FoxDotCode.namespace[char1+str(n)] for n in range(10)])
+        FoxDotCode.namespace[char1 + "_all"] = Group(
+            *[FoxDotCode.namespace[char1 + str(n)] for n in range(10)]
+        )
 
     return
+
 
 def _reload_synths():
     """ Resends all the synth / sample info to SuperCollider. Useful for times
         when starting FoxDot before running `FoxDot.start` in SuperCollider. """
     from . import SCLang
     from . import Effects
+
     reload(SCLang._SynthDefs)
     reload(Effects)
     Samples._reset_buffers()
     return
+
 
 def foxdot_reload():
     Server.reset()
@@ -164,6 +184,7 @@ def foxdot_reload():
     FxList.reload()
     Samples.reset()
     return
+
 
 def _convert_json_bpm(clock, data):
     """ Returns a TimeVar object that has been sent across a network using JSON """
@@ -175,16 +196,19 @@ def _convert_json_bpm(clock, data):
     else:
         return data
 
+
 def Master():
     """ Returns a `Group` containing all the players currently active in the Clock """
     return Group(*Clock.playing)
 
+
 def Ramp(t=32, ramp_time=4):
     """ Returns a `linvar` that goes from 0 to 1 over the course of the last
         `ramp_time` bars of every `t` length cycle. """
-    return linvar([0,0,1,0],[t-ramp_time, ramp_time, 0, 0])
+    return linvar([0, 0, 1, 0], [t - ramp_time, ramp_time, 0, 0])
 
-def allow_connections(valid = True, *args, **kwargs):
+
+def allow_connections(valid=True, *args, **kwargs):
     """ Starts a new instance of ServerManager.TempoServer and connects it with the clock. Default port is 57999 """
     if valid:
         Clock.start_tempo_server(TempoServer, **kwargs)
@@ -194,27 +218,32 @@ def allow_connections(valid = True, *args, **kwargs):
         print("Closed connections")
     return
 
+
 # Util class
+
 
 class _util:
     def __repr__(self):
         return "FoxDot ver. {}".format(__version__)
+
     def reload(self):
         Server.reset()
         SynthDefs.reload()
         FxList.reload()
         Samples.reset()
         return
+
     def reassign_clock(self):
-        FoxDotCode.namespace['Clock'] = _Clock
+        FoxDotCode.namespace["Clock"] = _Clock
         return
+
 
 FoxDot = _util()
 
 # Create a clock and define functions
 
 logging.basicConfig(level=logging.ERROR)
-when.set_namespace(FoxDotCode) # experimental
+when.set_namespace(FoxDotCode)  # experimental
 
 _Clock = Clock = TempoClock()
 

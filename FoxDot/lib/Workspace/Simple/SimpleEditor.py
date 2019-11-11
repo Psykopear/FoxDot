@@ -12,44 +12,49 @@ from .SimpleMenu import Menu
 from ...Settings import *
 from ...Code import execute
 
+
 class workspace:
     """ Wrapper for wxPython app """
 
     def __init__(self, CodeClass):
 
         self.app = wx.App(False)
-        self.root = Editor(None, 'FoxDot - Live Coding with Python and SuperCollider')
+        self.root = Editor(None, "FoxDot - Live Coding with Python and SuperCollider")
 
     def run(self):
         """ Starts the wx mainloop for the master widget """
         while True:
 
             try:
-                
+
                 self.app.MainLoop()
-                
+
                 break
 
             # Temporary fix to unicode issues with Mac OS
-            
-            except(UnicodeDecodeError):
-            
+
+            except (UnicodeDecodeError):
+
                 pass
-            
+
             except (KeyboardInterrupt, SystemExit):
 
                 # Clean exit
-                
+
                 execute("Clock.stop()")
                 execute("Server.quit()")
-                
+
                 break
+
 
 class Editor(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=(960*1.5,540*1.5))
+        wx.Frame.__init__(self, parent, title=title, size=(960 * 1.5, 540 * 1.5))
 
-        self.text = Text(self, style=wx.TE_MULTILINE | wx.TE_PROCESS_ENTER | wx.TE_RICH2 | wx.TE_CHARWRAP)
+        self.text = Text(
+            self,
+            style=wx.TE_MULTILINE | wx.TE_PROCESS_ENTER | wx.TE_RICH2 | wx.TE_CHARWRAP,
+        )
 
         # Cmd+H closes MacOS apps
 
@@ -59,13 +64,14 @@ class Editor(wx.Frame):
 
         shortcut_id = [wx.NewId() for n in range(10)]
 
-        accel_tbl = wx.AcceleratorTable([
-            (wx.ACCEL_CTRL,  ord("\n"), shortcut_id[0] ),
-            (wx.ACCEL_ALT,   ord("\n"), shortcut_id[1] ),
-            (wx.ACCEL_CTRL,  ord("."),  shortcut_id[2] ),
-            (wx.ACCEL_CTRL,  ord(self.help_key.lower()), shortcut_id[3] ),
-            (wx.ACCEL_CTRL,  ord("s"), shortcut_id[4] ),
-            (wx.ACCEL_CTRL,  ord("o"), shortcut_id[5] ),
+        accel_tbl = wx.AcceleratorTable(
+            [
+                (wx.ACCEL_CTRL, ord("\n"), shortcut_id[0]),
+                (wx.ACCEL_ALT, ord("\n"), shortcut_id[1]),
+                (wx.ACCEL_CTRL, ord("."), shortcut_id[2]),
+                (wx.ACCEL_CTRL, ord(self.help_key.lower()), shortcut_id[3]),
+                (wx.ACCEL_CTRL, ord("s"), shortcut_id[4]),
+                (wx.ACCEL_CTRL, ord("o"), shortcut_id[5]),
             ]
         )
 
@@ -73,11 +79,11 @@ class Editor(wx.Frame):
 
         # Bindings
         self.Bind(wx.EVT_MENU, self.ctrl_return, id=shortcut_id[0])
-        self.Bind(wx.EVT_MENU, self.alt_return,  id=shortcut_id[1])
+        self.Bind(wx.EVT_MENU, self.alt_return, id=shortcut_id[1])
         self.Bind(wx.EVT_MENU, self.ctrl_period, id=shortcut_id[2])
-        self.Bind(wx.EVT_MENU, self.ctrl_help,   id=shortcut_id[3])
-        self.Bind(wx.EVT_MENU, self.ctrl_save,   id=shortcut_id[4])
-        self.Bind(wx.EVT_MENU, self.ctrl_open,   id=shortcut_id[5])
+        self.Bind(wx.EVT_MENU, self.ctrl_help, id=shortcut_id[3])
+        self.Bind(wx.EVT_MENU, self.ctrl_save, id=shortcut_id[4])
+        self.Bind(wx.EVT_MENU, self.ctrl_open, id=shortcut_id[5])
 
         # Console and status bar
         self.console = wx.TextCtrl(self, style=wx.TE_READONLY | wx.TE_MULTILINE)
@@ -85,7 +91,7 @@ class Editor(wx.Frame):
 
         # Set font
 
-        mono_font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        mono_font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u"Consolas")
         self.text.SetFont(mono_font)
         self.console.SetFont(mono_font)
 
@@ -116,20 +122,20 @@ class Editor(wx.Frame):
         return self.Close(True)
 
     def hello(self):
-        """ Show welcome message """      
+        """ Show welcome message """
 
         if SYSTEM == MAC_OS:
 
             ctrl = "Cmd"
-        
+
         else:
-        
+
             ctrl = "Ctrl"
-        
+
         hello = "Welcome to FoxDot! Press {}+{} for help.".format(ctrl, self.help_key)
-        
+
         print(hello)
-        
+
         print("-" * len(hello))
 
         return
@@ -137,7 +143,9 @@ class Editor(wx.Frame):
     def flash(self, start, end):
         """ Highlight block of code and schedule de-highlight """
         self.text.highlight_block(start, end)
-        return wx.CallLater(200, lambda: self.text.highlight_block(start, end, undo=True))
+        return wx.CallLater(
+            200, lambda: self.text.highlight_block(start, end, undo=True)
+        )
 
     # Binding
 
@@ -168,11 +176,11 @@ class Editor(wx.Frame):
         if SYSTEM == MAC_OS:
 
             ctrl = "Cmd"
-        
+
         else:
-        
+
             ctrl = "Ctrl"
-            
+
         print("FoxDot Help:")
         print("-----------------------------------------")
         print("{}+Return           : Execute code".format(ctrl))
@@ -191,29 +199,39 @@ class Editor(wx.Frame):
 
     def ctrl_save(self, event):
         """ Save the contents in a .py file """
-        with wx.FileDialog(self, "Save to disk",  wildcard="PY files (*.py)|*.py", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as fileDialog:
+        with wx.FileDialog(
+            self,
+            "Save to disk",
+            wildcard="PY files (*.py)|*.py",
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+        ) as fileDialog:
 
             if fileDialog.ShowModal() == wx.ID_CANCEL:
                 return
 
             # save the current contents in the file
-            
+
             pathname = fileDialog.GetPath()
-            
+
             try:
-                with open(pathname, 'w') as file:
+                with open(pathname, "w") as file:
                     file.write(self.text.GetValue())
             except IOError:
                 print("Cannot save file '%s'." % pathname)
 
     def ctrl_open(self, event):
         """ Open a file """
-        with wx.FileDialog(self, "Open a file", wildcard="PY files (*.py)|*.py", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as fileDialog:
+        with wx.FileDialog(
+            self,
+            "Open a file",
+            wildcard="PY files (*.py)|*.py",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
+        ) as fileDialog:
             if fileDialog.ShowModal() == wx.ID_CANCEL:
                 return
             pathname = fileDialog.GetPath()
             try:
-                with open(pathname, 'r') as file:
+                with open(pathname, "r") as file:
                     text = file.read()
                     self.text.SetValue(text)
             except IOError:

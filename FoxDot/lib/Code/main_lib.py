@@ -14,7 +14,7 @@ try:
 except ImportError:
 
     TypeType = type
-    
+
 from ..Utils import modi
 from ..Settings import *
 
@@ -28,15 +28,16 @@ Base for any self-scheduling objects
 # Player RegEx
 re_player = re.compile(r"(\s*?)(\w+)\s*?>>\s*?\w+")
 
+
 class LiveObject(object):
 
     foxdot_object = True
     isAlive = True
-    
+
     metro = None
-    step  = None
-    n     = 0
-    
+    step = None
+    n = 0
+
     def kill(self):
         self.isAlive = False
         return self
@@ -46,6 +47,7 @@ class LiveObject(object):
         self.n += 1
         return self
 
+
 """
     FoxCode
     =======
@@ -53,22 +55,27 @@ class LiveObject(object):
     
 """
 
+
 class CodeString:
     def __init__(self, raw):
         self.raw = raw
         self.iter = -1
-        self.lines = [s + "\n" for s in self.raw.split("\n")] + ['']
+        self.lines = [s + "\n" for s in self.raw.split("\n")] + [""]
+
     def readline(self):
         self.iter += 1
         return self.lines[self.iter]
+
     def __str__(self):
         return self.raw
+
 
 if sys.version_info[0] > 2:
 
     def clean(string):
         string = string.replace("\u03BB", "lambda")
         return string
+
 
 else:
 
@@ -77,11 +84,13 @@ else:
         string = string.replace(u"\u03BB", "lambda")
         return string.encode("ascii", "replace")
 
+
 class _StartupFile:
     def __init__(self, path):
         self.set_path(path)
+
     def set_path(self, path):
-        self.path = path if path  is None else os.path.realpath(path)
+        self.path = path if path is None else os.path.realpath(path)
 
     def load(self):
         if self.path is not None:
@@ -94,40 +103,42 @@ class _StartupFile:
                 WarningMsg("'{}' startup file not found.".format(self.path))
         return ""
 
+
 FOXDOT_STARTUP = _StartupFile(FOXDOT_STARTUP_PATH)
-        
+
+
 class FoxDotCode:
-    namespace={}
-    player_line_numbers={}
+    namespace = {}
+    player_line_numbers = {}
 
     @staticmethod
     def _compile(string):
-        ''' Returns the bytecode for  '''
+        """ Returns the bytecode for  """
         return compile(str(CodeString(string)), "FoxDot", "exec")
 
     @classmethod
     def use_sample_directory(cls, directory):
-        ''' Forces FoxDot to look in `directory` instead of the default 
-            directory when using audio samples. '''
-        return cls.namespace['symbolToDir'].set_root( directory )
+        """ Forces FoxDot to look in `directory` instead of the default 
+            directory when using audio samples. """
+        return cls.namespace["symbolToDir"].set_root(directory)
 
     @classmethod
     def use_startup_file(cls, path):
-        return cls.namespace['FOXDOT_STARTUP'].set_path(path)
+        return cls.namespace["FOXDOT_STARTUP"].set_path(path)
 
     @classmethod
     def no_startup(cls):
         return cls.namespace["FOXDOT_STARTUP"].set_path(None)
 
-    def load_startup_file(self): 
+    def load_startup_file(self):
         """ Must be initialised first """
         code = self.namespace["FOXDOT_STARTUP"].load()
         return self.__call__(code, verbose=False)
-                 
+
     def __call__(self, code, verbose=True, verbose_error=None):
         """ Takes a string of FoxDot code and executes as Python """
 
-        if self.namespace['_Clock'].waiting_for_sync:
+        if self.namespace["_Clock"].waiting_for_sync:
 
             time.sleep(0.25)
             return self.__call__(code, verbose, verbose_error)
@@ -176,11 +187,11 @@ class FoxDotCode:
             match = re_player.match(line)
             line_changed = False
 
-            if match is not None:                
+            if match is not None:
 
                 whitespace = len(match.group(1))
-                player     = match.group(2)
-                line       = i + offset
+                player = match.group(2)
+                line = i + offset
 
                 if player in self.player_line_numbers:
 
@@ -196,29 +207,34 @@ class FoxDotCode:
                     update.append("{}.whitespace  = {}".format(player, whitespace))
 
         # Execute updates if necessary
-    
+
         if len(update) > 0:
 
-            self.__call__("\n".join(update), verbose = False)
-                
+            self.__call__("\n".join(update), verbose=False)
+
         return
 
-execute = FoxDotCode() # this is not well named
+
+execute = FoxDotCode()  # this is not well named
+
 
 def get_now(obj):
     """ Returns the value of objects if they are time-varying """
-    return getattr(obj, 'now', lambda: obj).__call__()
+    return getattr(obj, "now", lambda: obj).__call__()
+
 
 def get_input():
     """ Similar to `input` but can handle multi-line input. Terminates on a final "\n" """
-    line = " "; text = []
-    
+    line = " "
+    text = []
+
     while len(line) > 0:
-        
+
         line = input("")
         text.append(line)
 
     return "\n".join(text)
+
 
 def handle_stdin():
     """ When FoxDot is run with the --pipe added, this function
@@ -234,26 +250,31 @@ def handle_stdin():
 
             execute(text, verbose=False, verbose_error=True)
 
-        except(EOFError, KeyboardInterrupt):
+        except (EOFError, KeyboardInterrupt):
 
             sys.exit("Quitting")
 
     return
+
 
 def stdout(code):
     """ Shell-based output """
     console_text = code.strip().split("\n")
     return ">>> {}".format("\n... ".join(console_text))
 
+
 def debug_stdout(*args):
     """ Forces prints to server-side """
     sys.__stdout__.write(" ".join([str(s) for s in args]) + "\n")
 
+
 def load_startup_file():
     return execute.load_startup_file()
 
+
 def WarningMsg(*text):
-    print("Warning: {}".format( " ".join(str(s) for s in text) ))
+    print("Warning: {}".format(" ".join(str(s) for s in text)))
+
 
 def write_to_file(fn, text):
     try:
@@ -263,17 +284,21 @@ def write_to_file(fn, text):
         print("Unable to write to {}".format(fn))
     return
 
+
 # These functions return information about an imported module
 
 # Should use insepct module
+
 
 def classes(module):
     """ Returns a list of class names defined in module """
     return [name for name, data in vars(module).items() if type(data) == TypeType]
 
+
 def instances(module, cls):
     """ Returns a list of instances of cls from module """
     return [name for name, data in vars(module).items() if isinstance(data, cls)]
+
 
 def functions(module):
     """ Returns a list of function names defined in module """

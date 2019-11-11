@@ -1,16 +1,16 @@
 from __future__ import absolute_import, division, print_function
 
-from .Utils   import modi
+from .Utils import modi
 from .TimeVar import TimeVar
 
-CHROMATIC_NOTES = ["C"," ","D"," ","E","F"," ","G"," ","A"," ","B"]
+CHROMATIC_NOTES = ["C", " ", "D", " ", "E", "F", " ", "G", " ", "A", " ", "B"]
+
 
 class Note:
-
     def __init__(self, index):
 
         self.char = None
-        self.num  = None
+        self.num = None
 
         self.set(index)
 
@@ -42,11 +42,11 @@ class Note:
                 raise TypeError("Could not convert string '%s' to Note" % index)
 
             self.char = char
-            self.num  = (CHROMATIC_NOTES.index(char[0]) + mod) % len(CHROMATIC_NOTES)
+            self.num = (CHROMATIC_NOTES.index(char[0]) + mod) % len(CHROMATIC_NOTES)
 
         if type(index) is int:
 
-            self.num  = index
+            self.num = index
             self.char = modi(CHROMATIC_NOTES, index)
 
         if type(index) is float:
@@ -85,17 +85,21 @@ class Note:
 
         return self
 
+
 class __root__:
     def __init__(self):
         self.default = Note("C")
+
     def __setattr__(self, key, value):
         if key == "default" and key in vars(self):
             self.default.set(value)
         else:
             self.__dict__[key] = value
         return
+
     def reset(self):
         """ Sets the root to 0 """
         self.default = 0
+
 
 Root = __root__()

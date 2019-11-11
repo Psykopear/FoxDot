@@ -8,20 +8,23 @@ TODO: using __call__ -> go through getattribute and check instead of already hav
 from __future__ import absolute_import, division, print_function
 
 from .Patterns import *
-from .Utils  import *
+from .Utils import *
 from .Patterns.Operations import *
-from .Constants import inf 
+from .Constants import inf
 
 from time import time
 
+
 def fetch(func):
     """ Function to wrap basic lambda operators for TimeVars  """
+
     def eval_now(a, b):
         if isinstance(a, TimeVar):
             a = a.now()
         if isinstance(b, TimeVar):
             b = b.now()
         return func(a, b)
+
     return eval_now
 
 
@@ -37,18 +40,18 @@ class TimeVar(object):
 
             dur = self.metro.bar_length()
 
-        self.name     = "un-named"
+        self.name = "un-named"
 
-        self.start_time = float(start) # offset
+        self.start_time = float(start)  # offset
 
-        self.values   = values
-        self.dur      = dur
-        self.bpm      = kwargs.get('bpm', None)
+        self.values = values
+        self.dur = dur
+        self.bpm = kwargs.get("bpm", None)
 
-        self.get_seconds = bool(kwargs.get('seconds', False))
+        self.get_seconds = bool(kwargs.get("seconds", False))
 
         # Dynamic method for calculating values
-        self.func     = Nil
+        self.func = Nil
         self.evaluate = fetch(Nil)
         self.dependency = None
 
@@ -56,17 +59,17 @@ class TimeVar(object):
 
         self.current_value = None
         self.current_index = 0
-        self.next_value    = None
-        self.next_time     = 0
-        self.prev_time     = 0
-        self.next_index    = 0
+        self.next_value = None
+        self.next_time = 0
+        self.prev_time = 0
+        self.next_index = 0
 
         # Private flags
 
         self.__accessed = False
         self.__inf_index = None
 
-        self.proportion    = 0
+        self.proportion = 0
 
         # If the clock is not ticking, start it
 
@@ -99,20 +102,27 @@ class TimeVar(object):
     # Standard dunder methods
     def __str__(self):
         return str(self.now())
+
     def __repr__(self):
         return str(self.now())
+
     def __len__(self):
         return len(self.now())
+
     def __int__(self):
         return int(self.now())
+
     def __float__(self):
         return float(self.now())
+
     def __abs__(self):
         return abs(self.now())
 
     # For printing the details
     def info(self):
-        return "<{}({}, {})>".format(self.__class__.__name__, repr(self.get_values()), repr(self.get_durs()))
+        return "<{}({}, {})>".format(
+            self.__class__.__name__, repr(self.get_values()), repr(self.get_durs())
+        )
 
     def all_values(self):
         """ Displays the values and the dependency value - useful for debugging """
@@ -131,7 +141,7 @@ class TimeVar(object):
         """ Updates the TimeVar with new values.
         """
 
-        self.bpm = kwargs.get('bpm', self.bpm)
+        self.bpm = kwargs.get("bpm", self.bpm)
 
         #: Update the durations of each state
 
@@ -160,7 +170,10 @@ class TimeVar(object):
 
                 next_dur = self.dur[self.next_index]
 
-                self.next_time, self.prev_time = self.next_time + next_dur, self.next_time
+                self.next_time, self.prev_time = (
+                    self.next_time + next_dur,
+                    self.next_time,
+                )
 
                 # If we find an "inf"
 
@@ -180,7 +193,9 @@ class TimeVar(object):
 
         try:
 
-            self.proportion = float((time - self.prev_time) / (self.next_time - self.prev_time))
+            self.proportion = float(
+                (time - self.prev_time) / (self.next_time - self.prev_time)
+            )
 
         except ZeroDivisionError:
 
@@ -207,7 +222,7 @@ class TimeVar(object):
         return self.__inf_index
 
     def check_for_inf(self, duration):
-        return (self.__accessed and duration == inf)
+        return self.__accessed and duration == inf
 
     def flag_accessed(self):
         self.__accessed = True
@@ -215,7 +230,7 @@ class TimeVar(object):
 
     # Evaluation methods
 
-    def calculate(self, val): # maybe rename to resolve
+    def calculate(self, val):  # maybe rename to resolve
         """ Returns val as modified by its dependencies """
         return self.evaluate(val, self.dependency)
 
@@ -228,7 +243,7 @@ class TimeVar(object):
         if beat is None:
             beat = self.metro.now()
         if self.bpm is not None:
-            beat *= (self.bpm / float(self.metro.bpm))
+            beat *= self.bpm / float(self.metro.bpm)
         return float(beat)
 
     def now(self, time=None):
@@ -236,7 +251,7 @@ class TimeVar(object):
 
         i = self.get_current_index(time)
         self.current_value = self.calculate(self.values[i])
-        
+
         return self.current_value
 
     def copy(self):
@@ -266,11 +281,11 @@ class TimeVar(object):
         return new
 
     def lshift(self, duration):
-        time = [self.dur[0]-duration] + list(self.dur[1:]) + [duration]
+        time = [self.dur[0] - duration] + list(self.dur[1:]) + [duration]
         return self.__class__(self.values, time)
 
     def rshift(self, duration):
-        time = [duration] + list(self.dur[:-1]) + [self.dur[-1]-duration]
+        time = [duration] + list(self.dur[:-1]) + [self.dur[-1] - duration]
         data = [self.values[-1]] + list(self.values)
         return self.__class__(data, time)
 
@@ -298,7 +313,7 @@ class TimeVar(object):
 
     def set_eval(self, func):
         self.evaluate = fetch(func)
-        self.func     = func
+        self.func = func
         return
 
     def __add__(self, other):
@@ -401,12 +416,15 @@ class TimeVar(object):
     def __iadd__(self, other):
         self.values = self.values + other
         return self
+
     def __isub__(self, other):
         self.values = self.values - other
         return self
+
     def __imul__(self, other):
         self.values = self.values * other
         return self
+
     def __idiv__(self, other):
         self.values = self.values / other
         return self
@@ -478,41 +496,55 @@ class TimeVar(object):
         new.evaluate = fetch(lambda a, b: func(b))
         return new
 
+
 class ChildTimeVar(TimeVar):
     """ When a new TimeVar is created using a function such as addition,
         e.g. var([0,2]) + 2, then a ChildTimeVar is created that contains a
         single value but also creates a new ChildTimeVar when operated upon
         and behaves just as a TimeVar does."""
+
     def now(self, time=None):
         self.current_value = self.calculate(self.values[0])
         return self.current_value
+
 
 class linvar(TimeVar):
     def now(self, time=None):
         """ Returns the value currently represented by this TimeVar """
         i = self.get_current_index(time)
         self.current_value = self.calculate(self.values[i])
-        self.next_value    = self.calculate(self.values[i + 1])
+        self.next_value = self.calculate(self.values[i + 1])
         return self.get_timevar_value()
 
     def get_timevar_value(self):
-        return (self.current_value * (1-self.proportion)) + (self.next_value * self.proportion)
+        return (self.current_value * (1 - self.proportion)) + (
+            self.next_value * self.proportion
+        )
+
 
 class expvar(linvar):
     def get_timevar_value(self):
         self.proportion *= self.proportion
-        return (self.current_value * (1-self.proportion)) + (self.next_value * self.proportion)
+        return (self.current_value * (1 - self.proportion)) + (
+            self.next_value * self.proportion
+        )
+
 
 import math
 
+
 class sinvar(linvar):
     def get_timevar_value(self):
-        d = self.current_value  > self.next_value
+        d = self.current_value > self.next_value
         x = (self.proportion * 90) + (d * 270)
         self.proportion = math.sin(math.radians(x)) + int(d)
-        return (self.current_value * (1-self.proportion)) + (self.next_value * self.proportion)
+        return (self.current_value * (1 - self.proportion)) + (
+            self.next_value * self.proportion
+        )
+
 
 PATTERN_METHODS = Pattern.get_methods()
+
 
 class Pvar(TimeVar):
     """ A TimeVar that represents Patterns that change over time e.g.
@@ -524,7 +556,9 @@ class Pvar(TimeVar):
             >>> print a # time is 4
             P[4, 5]
     """
+
     stream = PatternContainer
+
     def __init__(self, values, dur=None, **kwargs):
 
         try:
@@ -536,7 +570,6 @@ class Pvar(TimeVar):
             data = [values]
 
         TimeVar.__init__(self, data, dur, **kwargs)
-
 
     def __get_pattern_attr(self, attr):
         """ Returns a function that transforms the patterns of this Pvar if the attr
@@ -555,7 +588,9 @@ class Pvar(TimeVar):
 
                     print(len(self.values))
 
-                    new_values = [getattr(pat, attr)(*args, **kwargs) for pat in self.values]
+                    new_values = [
+                        getattr(pat, attr)(*args, **kwargs) for pat in self.values
+                    ]
 
                     return Pvar(new_values, dur=self.dur)
 
@@ -621,7 +656,7 @@ class Pvar(TimeVar):
 
     def set_eval(self, func):
         self.evaluate = fetch(func)
-        self.func     = func
+        self.func = func
         return
 
     def __add__(self, other):
@@ -723,6 +758,7 @@ class Pvar(TimeVar):
         new.set_eval(lambda a, b: b.transform(func))
         return new
 
+
 class ChildPvar(Pvar):
     def now(self, time=None):
         self.current_value = self.calculate(self.values[0])
@@ -734,16 +770,21 @@ class PvarGenerator(Pvar):
         then a `PvarGenerator` is returned. Each argument is stored as a TimeVar
         and the function is called whenever the arguments are changed
     """
+
     def __init__(self, func, *args, **kwargs):
-        self.p_func = func # p_func is the Pattern function e.g. PDur but self.func is created when operating on this PvarGenerator
-        
+        self.p_func = (
+            func
+        )  # p_func is the Pattern function e.g. PDur but self.func is created when operating on this PvarGenerator
+
         self.args = []
 
         if "pattern" in kwargs:
 
             self.args.append(kwargs["pattern"])
-        
-        self.args.extend( [(arg if isinstance(arg, TimeVar) else TimeVar(arg)) for arg in args] )
+
+        self.args.extend(
+            [(arg if isinstance(arg, TimeVar) else TimeVar(arg)) for arg in args]
+        )
 
         self.last_args = []
         self.last_data = []
@@ -751,7 +792,9 @@ class PvarGenerator(Pvar):
         self.dependency = None
 
     def info(self):
-        return "<{} {}>".format(self.__class__.__name__, self.func.__name__ + str(tuple(self.args)))
+        return "<{} {}>".format(
+            self.__class__.__name__, self.func.__name__ + str(tuple(self.args))
+        )
 
     def now(self):
         new_args = [arg.now() if isinstance(arg, TimeVar) else arg for arg in self.args]
@@ -770,13 +813,13 @@ class PvarGenerator(Pvar):
 
     def set_eval(self, func):
         self.evaluate = fetch(func)
-        self.func     = func
+        self.func = func
         return
 
     def __getattribute__(self, attr):
         # If it's a method, only return the method if its new, transform, or a dunder
-        if attr in Pattern.get_methods():   
-            
+        if attr in Pattern.get_methods():
+
             if attr not in ("new", "now", "transform") and not attr.startswith("__"):
 
                 # return a function that transforms the patterns of the  root Pvar
@@ -791,7 +834,9 @@ class PvarGenerator(Pvar):
 
                         def new_func(*old_args, **old_kwargs):
 
-                            return getattr(self.p_func(*old_args, **old_kwargs), attr)(*args, **kwargs)
+                            return getattr(self.p_func(*old_args, **old_kwargs), attr)(
+                                *args, **kwargs
+                            )
 
                         return PvarGenerator(new_func, *self.args)
 
@@ -804,11 +849,13 @@ class PvarGenerator(Pvar):
                         return self.func(new_pvar_gen, self.original_value)
 
                 return get_new_pvar_gen
-                
+
         return object.__getattribute__(self, attr)
+
 
 class PvarGeneratorEx(PvarGenerator):
     """ Un-Documented """
+
     def __init__(self, func, *args):
         self.func = func
         self.args = list(args)
@@ -817,14 +864,16 @@ class PvarGeneratorEx(PvarGenerator):
         self.evaluate = fetch(Nil)
         self.dependency = 1
 
+
 class mapvar(Pvar):
     """ Like a `Pvar`, the `mapvar` returns a whole `Pattern` as opposed to a single
         value, but instead of using the global clock to find the current value it
         uses the value in an instance of the `PlayerKey` class or another `TimeVar`. """
+
     def __init__(self, key, mapping, default=0):
         TimeVar.__init__(self, [])
-        self.key     = key
-        self.values  = {key: asStream(value) for key, value in mapping.items()}
+        self.key = key
+        self.values = {key: asStream(value) for key, value in mapping.items()}
         self.default = asStream(default)
 
     def get_current_index(self, time=None):
@@ -837,7 +886,9 @@ class mapvar(Pvar):
         self.current_value = self.calculate(self.values.get(i, self.default))
         return self.current_value
 
+
 # Store and updates TimeVars
+
 
 class _var_dict(object):
     """
@@ -853,9 +904,11 @@ class _var_dict(object):
 
     def __init__(self):
         self.__vars = {}
+
     @staticmethod
     def __call__(*args, **kwargs):
         return TimeVar(*args, **kwargs)
+
     def __setattr__(self, name, value):
         if name != "__vars" and isinstance(value, TimeVar):
             if name in self.__vars:
@@ -866,6 +919,7 @@ class _var_dict(object):
                 self.__vars[name] = value
             return
         object.__setattr__(self, name, value)
+
     def __getattr__(self, name):
         if name in self.__vars:
             value = self.__vars[name]
@@ -877,9 +931,10 @@ class _var_dict(object):
                 raise err
         return value
 
+
 var = _var_dict()
 
 # Give Main.Pattern a reference to TimeVar classes
-Pattern.TimeVar       = TimeVar
+Pattern.TimeVar = TimeVar
 Pattern.PvarGenerator = PvarGenerator
-Pattern.Pvar          = Pvar
+Pattern.Pvar = Pvar

@@ -6,6 +6,9 @@ try:
     import wx
 except ImportError:
     import sys
-    sys.exit("Error: wxPython is required to run FoxDot in simple mode. Install by running pip install wxpython.")
+
+    sys.exit(
+        "Error: wxPython is required to run FoxDot in simple mode. Install by running pip install wxpython."
+    )
 
 from .SimpleEditor import *

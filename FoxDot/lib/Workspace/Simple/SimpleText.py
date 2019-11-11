@@ -1,12 +1,16 @@
 import wx.stc
 import wx
 
+
 class Text(wx.TextCtrl):
     """docstring for SimpleText"""
+
     def __init__(self, *args, **kwargs):
         wx.TextCtrl.__init__(self, *args, **kwargs)
-        self._default_style   = wx.TextAttr(wx.Colour(0, 0, 0), wx.Colour(255,255,255))
-        self._highlight_style = wx.TextAttr(wx.Colour(255,255,255), wx.Colour(255,0,0))
+        self._default_style = wx.TextAttr(wx.Colour(0, 0, 0), wx.Colour(255, 255, 255))
+        self._highlight_style = wx.TextAttr(
+            wx.Colour(255, 255, 255), wx.Colour(255, 0, 0)
+        )
 
     # Return values
 
@@ -37,8 +41,8 @@ class Text(wx.TextCtrl):
             if len(text) == 0:
                 start = row + 1
                 break
-            row -= 1            
-            
+            row -= 1
+
         return (start, end)
 
     def get_current_line_text(self):
@@ -61,13 +65,13 @@ class Text(wx.TextCtrl):
 
     def highlight_line(self, row):
         start = self.XYToPosition(0, row)
-        end   = self.XYToPosition(self.GetLineLength(row), row)
+        end = self.XYToPosition(self.GetLineLength(row), row)
         self.SetStyle(start, end, self._highlight_style)
         return
 
     def de_highlight_line(self, row):
         start = self.XYToPosition(0, row)
-        end   = self.XYToPosition(self.GetLineLength(row), row)
+        end = self.XYToPosition(self.GetLineLength(row), row)
         val = self.SetStyle(start, end, self._default_style)
         return
 

@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 from .tkimport import *
 
-from .Format  import *
+from .Format import *
 from .AppFunctions import stdout
 from .MenuBar import ConsolePopupMenu
 import math
@@ -16,15 +16,15 @@ except ImportError:
 #!/usr/bin/python
 """ Console widget that displays the true Python input """
 
-class console:
 
+class console:
     def __init__(self, master):
 
-        self.app  = master
+        self.app = master
         self.root = master.root
-        
+
         self.y_scroll = Scrollbar(self.root)
-        self.y_scroll.grid(row=2, column=2, sticky='nsew', rowspan=2)
+        self.y_scroll.grid(row=2, column=2, sticky="nsew", rowspan=2)
         self.scrollable = False
 
         # Right-click menu
@@ -33,7 +33,7 @@ class console:
 
         # Create a bar for changing console size
 
-        self.drag = Frame( self.root , bg="white", height=2, cursor="sb_v_double_arrow")
+        self.drag = Frame(self.root, bg="white", height=2, cursor="sb_v_double_arrow")
 
         # Create canvas
 
@@ -41,23 +41,30 @@ class console:
         self.max_offset = 0
         self.root_h = self.height + self.app.text.height
 
-        self.canvas = Canvas(self.root,
-                             bg="black",
-                             bd=0,
-                             height=300,
-                             yscrollincrement=1,
-                             highlightthickness=0)
+        self.canvas = Canvas(
+            self.root,
+            bg="black",
+            bd=0,
+            height=300,
+            yscrollincrement=1,
+            highlightthickness=0,
+        )
 
-        self.canvas.bind("<Button-1>",          self.canvas_mouseclick)
-        self.canvas.bind("<ButtonRelease-1>",   self.canvas_mouserelease)
-        self.canvas.bind("<B1-Motion>",         self.canvas_mousedrag)
-        self.canvas.bind("<MouseWheel>",        self.on_scroll)
-        self.canvas.bind("<Button-{}>".format(2 if SYSTEM == MAC_OS else 3), self.show_popup)
-        self.canvas.bind("<{}-c>".format("Command" if SYSTEM == MAC_OS else "Control"),   self.edit_copy)
+        self.canvas.bind("<Button-1>", self.canvas_mouseclick)
+        self.canvas.bind("<ButtonRelease-1>", self.canvas_mouserelease)
+        self.canvas.bind("<B1-Motion>", self.canvas_mousedrag)
+        self.canvas.bind("<MouseWheel>", self.on_scroll)
+        self.canvas.bind(
+            "<Button-{}>".format(2 if SYSTEM == MAC_OS else 3), self.show_popup
+        )
+        self.canvas.bind(
+            "<{}-c>".format("Command" if SYSTEM == MAC_OS else "Control"),
+            self.edit_copy,
+        )
 
         self.padx = 5
         self.pady = 5
-        
+
         self.text_y = 0
 
         self.text_height = 0
@@ -69,10 +76,9 @@ class console:
 
         # Create text
 
-        self.text = self.canvas.create_text((self.padx, self.pady),
-                                            anchor=NW,
-                                            fill="white",
-                                            font = self.app.console_font)
+        self.text = self.canvas.create_text(
+            (self.padx, self.pady), anchor=NW, fill="white", font=self.app.console_font
+        )
 
         self.text_cursor = None
 
@@ -80,13 +86,13 @@ class console:
 
         # Allow for resizing
         self.mouse_down = False
-        self.drag.bind("<Button-1>",        self.drag_mouseclick)        
+        self.drag.bind("<Button-1>", self.drag_mouseclick)
         self.drag.bind("<ButtonRelease-1>", self.drag_mouserelease)
-        self.drag.bind("<B1-Motion>",       self.drag_mousedrag)
+        self.drag.bind("<B1-Motion>", self.drag_mousedrag)
 
         self.drag.grid(row=1, column=0, stick="nsew", columnspan=3)
         self.canvas.grid(row=2, column=0, sticky="nsew", columnspan=2)
-    
+
         self.queue = Queue.Queue()
         self.update()
 
@@ -116,7 +122,7 @@ class console:
         self.mouse_down = True
         self.root.grid_propagate(False)
         return
-    
+
     def drag_mouserelease(self, event):
         self.mouse_down = False
         self.app.text.focus_set()
@@ -129,17 +135,19 @@ class console:
 
             if textbox_line_h is not None:
 
-                self.app.text.height = int(self.app.text.winfo_height() / textbox_line_h[3])
-                
+                self.app.text.height = int(
+                    self.app.text.winfo_height() / textbox_line_h[3]
+                )
+
             self.root_h = self.height + self.app.text.height
 
             widget_y = self.canvas.winfo_rooty()
 
-            new_height = (self.canvas.winfo_height() + (widget_y - event.y_root) )
+            new_height = self.canvas.winfo_height() + (widget_y - event.y_root)
 
             self.height, old_height = new_height, self.height
 
-            self.canvas.config(height = max(self.height, 50))
+            self.canvas.config(height=max(self.height, 50))
 
             return "break"
 
@@ -154,10 +162,10 @@ class console:
 
                 self.canvas.itemconfig(self.text, width=self.canvas.winfo_width())
 
-                self.canvas.insert( self.text, "end", string )
+                self.canvas.insert(self.text, "end", string)
 
                 # Get the text bounding box
-                
+
                 bbox = self.canvas.bbox(self.text)
 
                 # Text box height
@@ -176,7 +184,9 @@ class console:
 
                     # The text should only move so that the end is at the bottom of the canvas
 
-                    self.text_y = self.max_offset = self.canvas_height - self.text_height
+                    self.text_y = self.max_offset = (
+                        self.canvas_height - self.text_height
+                    )
 
                     self.canvas.coords(self.text, (self.padx, self.text_y))
 
@@ -209,7 +219,7 @@ class console:
 
     def canvas_mouseclick(self, event):
         """ Forces the text to align itself and gives focus to the console """
-        self.canvas.insert( self.text, "end", "" )
+        self.canvas.insert(self.text, "end", "")
         self.canvas.focus_set()
         self.canvas.focus(self.text)
 
@@ -219,18 +229,18 @@ class console:
         # Calculate current mouse pos
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasx(event.y)
-        
+
         self.text_cursor = "@%d,%d" % (x, y)
-        
+
         return
 
     def canvas_mousedrag(self, event):
         """ Changes selection """
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasx(event.y)
-        
+
         xy = "@%d,%d" % (x, y)
-        
+
         self.canvas.select_from(self.text, self.text_cursor)
         self.canvas.select_to(self.text, xy)
         return
@@ -255,7 +265,7 @@ class console:
     def scroll_text(self, *args):
         # Moves the text by an amount (pressing the arrow buttons)
         if args[0] == "scroll":
-            self.move_text(int(args[1])*-1000)
+            self.move_text(int(args[1]) * -1000)
         # Dragging the scroll bar
         elif args[0] == "moveto":
             new_y = float(args[1])
@@ -267,11 +277,11 @@ class console:
 
     def move_text(self, delta):
         """ Moves the text up (negative) or down (positive) """
-    
+
         if SYSTEM != MAC_OS:
 
             delta /= 100
-        
+
         x, y = self.canvas.coords(self.text)
 
         self.text_y = max(min(self.pady, y + delta), self.max_offset)
@@ -281,9 +291,10 @@ class console:
         self.update_scrollbar()
 
         return
-        
+
     def on_scroll(self, event):
-        if self.scrollable: self.move_text(event.delta)            
+        if self.scrollable:
+            self.move_text(event.delta)
         return "break"
 
     def get_scrollbar_size(self):
@@ -298,12 +309,12 @@ class console:
             if point is not None:
                 a = point
             else:
-                a = (float(self.text_y) / self.max_offset) * (1-size)
-            b = a + size        
+                a = (float(self.text_y) / self.max_offset) * (1 - size)
+            b = a + size
         self.y_scroll.set(a, b)
         return a, b
 
-    def draw_arrow(self, start_x, start_y, width, colour,  direction, degree=45,):
+    def draw_arrow(self, start_x, start_y, width, colour, direction, degree=45):
         """ Works out the line to draw at 45 degrees, returns the x and y of the end
             of the line. Direction should be a string, "up" or "down" """
 
@@ -338,31 +349,31 @@ class console:
         """
         # All lines are 45 degress up then down
         grn_widths = [
-            random.randint(400, 600), # Large
-            random.randint(150, 350), # Medium
-            random.randint(25, 100),    # Small
-            ]
+            random.randint(400, 600),  # Large
+            random.randint(150, 350),  # Medium
+            random.randint(25, 100),  # Small
+        ]
 
         # Shuffle the widths and use a mirrored version for red
         random.shuffle(grn_widths)
-        
+
         red_widths = reversed(grn_widths)
 
-        start_x = random.choice([50,100,150,200])
-        start_y = random.choice([50,100])
-        step    = random.choice([10,20,25])
+        start_x = random.choice([50, 100, 150, 200])
+        start_y = random.choice([50, 100])
+        step = random.choice([10, 20, 25])
 
         # Draw Red line
         x, y = start_x, start_y
         for w in red_widths:
-            x, y = self.draw_arrow(x, y, w, '#571d0c', "down")
+            x, y = self.draw_arrow(x, y, w, "#571d0c", "down")
             x += step
 
         # Draw Green line
         # Define start point
         x, y = start_x, start_y + 100
         for w in grn_widths:
-            x, y = self.draw_arrow(x, y, w, '#1d5335', "up")
+            x, y = self.draw_arrow(x, y, w, "#1d5335", "up")
             x += step
         return
 

@@ -6,22 +6,26 @@ from __future__ import absolute_import, division, print_function
 
 _live_functions_dict = {}
 
+
 class _live_function:
     def __init__(self, func, dependency=None):
         self.func = func
         self.name = func.__name__
         self.live = False
         self.dependency = dependency
+
     def __call__(self, *args, **kwargs):
         self.live = True
-        if isinstance(self.dependency,  self.__class__):
+        if isinstance(self.dependency, self.__class__):
             self.dependency.live = False
         return self.func.__call__(*args, **kwargs)
+
     def update(self, func, dependency=None):
         self.func = func
         if dependency:
             self.dependency = dependency
         return
+
 
 def livefunction(f, dependency=None):
     """ Wraps a function 'f' in a flexible/interactive way """
@@ -35,7 +39,8 @@ def livefunction(f, dependency=None):
         _live_functions_dict[f.__name__].update(f, dependency)
     f = _live_functions_dict[f.__name__]
     # If the function is "live" call it
-    if f.live: f.__call__()    
+    if f.live:
+        f.__call__()
     return f
 
 

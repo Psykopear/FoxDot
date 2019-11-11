@@ -2,6 +2,7 @@ from .Sequences import *
 
 # Other useful functions that don't return a single pattern
 
+
 def CalculateEuclideanDelay(durations):
     """ Calculates a pattern of durations and delays using nested
         tuples/PGroups and the PDur algorithm -- currently not implemented.
@@ -24,12 +25,13 @@ def CalculateEuclideanDelay(durations):
             dels.append(0)
     return durs, dels
 
+
 def CalculateDelaysFromDur(durations):
     """ Used to calculate delays when the `dur` argument is given tuples.
         It replicates two events.
     """
     # If it's a PvarGenerator, this needs more work
-    #if isinstance(durations, Pattern.PvarGenerator):
+    # if isinstance(durations, Pattern.PvarGenerator):
     #    durs = durations.transform(lambda a, b: CalculateDelaysFromDur(b.now())[0])
     #    dels = durations.transform(lambda a, b: CalculateDelaysFromDur(b.now())[1]) # could be more efficient?
     #    return durs, dels
@@ -60,5 +62,3 @@ def CalculateDelaysFromDur(durations):
             durs.append(item)
             dels.append(0)
     return durs, dels.rotate(-1)
-    
-        

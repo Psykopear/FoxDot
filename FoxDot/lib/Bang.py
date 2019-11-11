@@ -12,18 +12,19 @@ from threading import Thread
 
 from .Code import execute
 
+
 class Bang:
 
     duration = 0.1
 
     def __init__(self, player, kwargs):
 
-        self.widget = execute.namespace['FoxDot']
+        self.widget = execute.namespace["FoxDot"]
 
         self.func = kwargs.get("func", None)
 
         # Argument is by default, the  player
-        
+
         self.args = kwargs.get("args", (player,))
 
         # User can supply a function to call on bang
@@ -43,7 +44,7 @@ class Bang:
             # Get visible portion of the text window
 
             try:
-            
+
                 a = self.widget.text.index("@0,0")
                 b = self.widget.text.index("@0,%d" % self.widget.text.winfo_height())
 
@@ -60,20 +61,22 @@ class Bang:
                 return
 
             if a <= player.line_number <= b:
-                
+
                 row = player.line_number
                 col = player.whitespace
-                env   = player.envelope
+                env = player.envelope
                 clock = player.metro
 
-                duration     = clock.beat_dur( player.dur / 2 )
+                duration = clock.beat_dur(player.dur / 2)
                 # message_time = player.queue_block.time
-                message_time = player.get_timestamp(player.queue_block.beat) # clock.latency
+                message_time = player.get_timestamp(
+                    player.queue_block.beat
+                )  # clock.latency
 
                 self.id = "{}_bang".format(player.id)
 
                 start = "%d.%d" % (row, col)
-                end   = "%d.end" % row
+                end = "%d.end" % row
 
                 def bang():
 
@@ -83,8 +86,14 @@ class Bang:
 
                         sleep(0.001)
 
-                    self.widget.addTask(target=self.widget.text.tag_add, args=(self.id, start, end))
-                    self.widget.addTask(target=self.widget.text.tag_config, args=(self.id,), kwargs=kwargs)
+                    self.widget.addTask(
+                        target=self.widget.text.tag_add, args=(self.id, start, end)
+                    )
+                    self.widget.addTask(
+                        target=self.widget.text.tag_config,
+                        args=(self.id,),
+                        kwargs=kwargs,
+                    )
                     self.widget.root.after(int(1000 * duration), self.remove)
                     return
 
@@ -95,4 +104,3 @@ class Bang:
     def remove(self):
         self.widget.addTask(target=self.widget.text.tag_delete, args=(self.id,))
         return
-      

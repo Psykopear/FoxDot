@@ -4,20 +4,27 @@ from copy import deepcopy
 import Queue
 from . import Grammar
 
+
 class null:
     def __init__(self, root=True):
         if root:
-            self.root=null(False)
+            self.root = null(False)
+
     def __repr__(self):
         return "null"
+
     def after(*args, **kwargs):
         return 0
+
     def read(self):
         return ""
+
     def replace(self, *args, **kwargs):
         return
+
     def exec_line(self, *args, **kwargs):
         return
+
 
 class Ghost:
 
@@ -35,11 +42,11 @@ class Ghost:
         new = Grammar.createPlayer(**syntax)
 
         self.instructions.put((original, new))
-        
+
         return
 
     def write(self):
-        ''' Create a list of instructions '''
+        """ Create a list of instructions """
 
         try:
 
@@ -49,16 +56,16 @@ class Ghost:
 
             for line, string in enumerate(self.widget.read().split("\n")):
 
-                 if old in string:
+                if old in string:
 
-                     line += 1
+                    line += 1
 
-                     break
+                    break
 
             else:
-                
-                 raise Queue.Empty()
-                
+
+                raise Queue.Empty()
+
             # 2. Replace
 
             self.widget.replace(line, old, new)
@@ -78,15 +85,14 @@ class Ghost:
             if self.running == True:
 
                 self.widget.root.after(choice([2000, 3000, 4000, 5000]), self.act)
-            
+
         return
-        
 
     def getPlayer(self):
-        ''' Choose a player from those available '''
+        """ Choose a player from those available """
 
         # Read the text from the current widget
-        
+
         text = self.widget.read()
 
         # Find all the players
@@ -103,14 +109,14 @@ class Ghost:
 
         if len(self.players) == 0:
 
-            return None # dict of a new blank player
+            return None  # dict of a new blank player
 
         else:
 
             return choice(self.players.keys())
 
     def act(self):
-        ''' main program '''
+        """ main program """
 
         p = self.getPlayer()
 
@@ -140,6 +146,7 @@ class Ghost:
 
     def stop(self):
         self.running = False
+
 
 if __name__ == "__main__":
     Ghost(null())

@@ -49,6 +49,7 @@ from .foxdot_func_cmp import *
 from threading import Thread
 from time import sleep
 
+
 class _whenStatement:
 
     namespace = {}
@@ -71,24 +72,24 @@ class _whenStatement:
 
     @classmethod
     def set_namespace(cls, ns):
-        ''' Define the namespace to execute the actions. Should be a `dict` '''
+        """ Define the namespace to execute the actions. Should be a `dict` """
         cls.namespace = ns
 
     def reset(self):
-        ''' Sets the `when` and `else` actions to nothing '''
+        """ Sets the `when` and `else` actions to nothing """
         self.action = lambda: None
         self.notaction = lambda: None
         self.do_switch = False
         self.elsedo_switch = False
 
     def evaluate(self):
-        ''' Calls the test expression, and if it has changed then
-            run the appropriate response code '''
+        """ Calls the test expression, and if it has changed then
+            run the appropriate response code """
         if self.expr():
             if not self.do_switch:
 
                 self.action()
-                    
+
                 self.toggle_live_functions(True)
                 self.do_switch = True
                 self.elsedo_switch = False
@@ -102,13 +103,13 @@ class _whenStatement:
                 self.elsedo_switch = True
 
     def toggle_live_functions(self, switch):
-        """ If the action functions are @livefunctions, turn them on/off """    
+        """ If the action functions are @livefunctions, turn them on/off """
         try:
             self.action.live = switch
         except:
             pass
         try:
-            self.notaction.live = (not switch)
+            self.notaction.live = not switch
         except:
             pass
         return
@@ -116,19 +117,19 @@ class _whenStatement:
     def when(self, func):
         self.expr = func
         return self
-                
+
     def then(self, func):
-        ''' Set the instructions for when the test expression is True. Should
-            be a list of strings. '''
+        """ Set the instructions for when the test expression is True. Should
+            be a list of strings. """
         self.action = func
         return self
-    
+
     def elsedo(self, func):
-        ''' Set the instructions for when the test expression is False. Should
-            be a list of strings. '''
+        """ Set the instructions for when the test expression is False. Should
+            be a list of strings. """
         self.notaction = func
         return self
-    
+
     def stop(self):
         self.reset()
         return self
@@ -138,14 +139,15 @@ class _whenStatement:
         self.remove_me = True
         return self
 
+
 class _whenLibrary:
     """  Used to store 'when statements'. Is accessed through the `__when__` object.
     """
-    
+
     def __init__(self):
         self.library = {}
         self.editing = None
-        
+
     def start_thread(self):
         self.thread = Thread(target=self.run)
         self.thread.daemon = True
@@ -165,7 +167,7 @@ class _whenLibrary:
         """ Continual loop evaluating when_statements
         """
         while len(self.library) > 0:
-            
+
             for name, expression in self.library.items():
 
                 if expression.remove_me == True:
@@ -179,15 +181,15 @@ class _whenLibrary:
             sleep(0.01)
 
         return
-        
+
     def __call__(self, name, **kwargs):
         """ Calling when() with no arguments will evaluate all expressions
             stored in self.library. Calling with func as a valid function
             will see if the function is in self.library and add it if not,
             or update do  / elsedo
 
-        """   
-            
+        """
+
         if name in self.library:
 
             return self.library[name]
@@ -212,12 +214,14 @@ class _whenLibrary:
 
     def a(self, expr):
         if self.editing is not None:
-            self.editing.when(expr)            
+            self.editing.when(expr)
         return None
+
     def b(self, expr):
         if self.editing is not None:
             self.editing.do(expr)
         return None
+
     def c(self, expr):
         if self.editing is not None:
             self.editing.elsedo(expr)
@@ -227,5 +231,6 @@ class _whenLibrary:
         """ Clears the library and stop scheduling """
         self.library = {}
         return self
+
 
 when = _whenLibrary()

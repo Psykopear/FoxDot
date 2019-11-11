@@ -8,25 +8,33 @@ from ..Settings import SYNTHDEF_DIR
 
 # Container for SynthDefs
 
+
 class SynthDict(dict):
     module = None
     server = None
+
     def __init__(self, **kwargs):
         dict.__init__(self, kwargs)
+
     def __str__(self):
         return str(list(self.keys()))
+
     def __repr__(self):
         return str(list(self.keys()))
+
     def __call__(self, name):
         return self[name]
+
     def reload(self):
         for key, item in self.items():
             item.load()
         return
+
     def set_server(self, serv):
         self.server = serv
         self.server.synthdefs = self
         return
+
 
 # Create container for SynthDefs
 
@@ -34,11 +42,12 @@ SynthDefs = SynthDict()
 
 # SynthDef Base Class
 
+
 class SynthDefBaseClass(object):
 
     server = Server
-    bus_name = 'bus'
-    var = ['osc', 'env']
+    bus_name = "bus"
+    var = ["osc", "env"]
     defaults = {}
     container = SynthDefs
     default_env = Env.perc()
@@ -50,43 +59,45 @@ class SynthDefBaseClass(object):
         self.synth_added = False
         # Initial behaviour such as amplitude / frequency modulation
         self.base = ["sus = sus * blur;"]
-        self.attr = [] # stores custom attributes
+        self.attr = []  # stores custom attributes
 
         # Name of the file to store the SynthDef
-        self.filename     = SYNTHDEF_DIR + "/{}.scd".format(self.name)
+        self.filename = SYNTHDEF_DIR + "/{}.scd".format(self.name)
 
         # SynthDef default arguments
-        self.osc         = instance("osc")
-        self.freq        = instance("freq")
-        self.fmod        = instance("fmod")
-        self.output      = instance("output")
-        self.sus         = instance("sus")
-        self.amp         = instance("amp")
-        self.pan         = instance("pan")
-        self.rate        = instance("rate")
-        self.blur        = instance("blur")
-        self.beat_dur    = instance("beat_dur")
+        self.osc = instance("osc")
+        self.freq = instance("freq")
+        self.fmod = instance("fmod")
+        self.output = instance("output")
+        self.sus = instance("sus")
+        self.amp = instance("amp")
+        self.pan = instance("pan")
+        self.rate = instance("rate")
+        self.blur = instance("blur")
+        self.beat_dur = instance("beat_dur")
 
         # Envelope
-        self.atk         = instance("atk")
-        self.decay       = instance("decay")
-        self.rel         = instance("rel") 
+        self.atk = instance("atk")
+        self.decay = instance("decay")
+        self.rel = instance("rel")
 
-        self.defaults = {   "amp"       : 1,
-                            "sus"       : 1,
-                            "pan"       : 0,
-                            "freq"      : 0,
-                            "vib"       : 0,
-                            "fmod"      : 0,
-                            "rate"      : 0,
-                            "bus"       : 0,
-                            "blur"      : 1,
-                            "beat_dur"  : 1,
-                            "atk"       : 0.01,
-                            "decay"     : 0.01,
-                            "rel"       : 0.01,
-                            "peak"      : 1,
-                            "level"     : 0.8 }
+        self.defaults = {
+            "amp": 1,
+            "sus": 1,
+            "pan": 0,
+            "freq": 0,
+            "vib": 0,
+            "fmod": 0,
+            "rate": 0,
+            "bus": 0,
+            "blur": 1,
+            "beat_dur": 1,
+            "atk": 0.01,
+            "decay": 0.01,
+            "rel": 0.01,
+            "peak": 1,
+            "level": 0.8,
+        }
 
         # The amp is multiplied by this before being sent to SC
         self.balance = 1
@@ -109,8 +120,8 @@ class SynthDefBaseClass(object):
     # ---------------------
 
     def __str__(self):
-        Def  = "SynthDef.new(\{},\n".format(self.name)
-        Def += "{}|{}|\n".format("{", format_args(kwargs=self.defaults, delim='='))
+        Def = "SynthDef.new(\{},\n".format(self.name)
+        Def += "{}|{}|\n".format("{", format_args(kwargs=self.defaults, delim="="))
         Def += "{}\n".format(self.get_base_class_variables())
         Def += "{}\n".format(self.get_base_class_behaviour())
         Def += "{}".format(self.get_custom_behaviour())
@@ -146,9 +157,9 @@ class SynthDefBaseClass(object):
         if key.startswith("_"):
             return object.__getattribute__(self, key)
 
-        defaults    = object.__getattribute__(self, 'defaults')
-        var         = object.__getattribute__(self, 'var')
-        synth_added = object.__getattribute__(self, 'synth_added')
+        defaults = object.__getattribute__(self, "defaults")
+        var = object.__getattribute__(self, "var")
+        synth_added = object.__getattribute__(self, "synth_added")
 
         attr = list(defaults.keys()) + var
 
@@ -169,7 +180,6 @@ class SynthDefBaseClass(object):
         if key not in self.__dict__ or str(key) != str(value):
             self.__dict__[key] = value
 
-
     # Defining class behaviour
     # ------------------------
 
@@ -188,7 +198,7 @@ class SynthDefBaseClass(object):
         for arg, value in self.attr:
             arg, value = str(arg), str(value)
             if arg != value:
-                string += (arg + '=' + value + ';\n')
+                string += arg + "=" + value + ";\n"
         return string
 
     def get_custom_behaviour2(self):
@@ -197,7 +207,7 @@ class SynthDefBaseClass(object):
             if arg in self.__dict__:
                 # Don't add redundant lines e.g. sus=sus;
                 if str(arg) != str(self.__dict__[arg]):
-                    string += (str(arg) + '=' + str(self.__dict__[arg]) + ';\n')
+                    string += str(arg) + "=" + str(self.__dict__[arg]) + ";\n"
         return string
 
     def adsr(self, **kwargs):
@@ -205,7 +215,6 @@ class SynthDefBaseClass(object):
         self.defaults.update(**kwargs)
         self.env = Env.adsr()
         return
-
 
     # Adding the SynthDef to the Server
     # ---------------------------------
@@ -232,20 +241,20 @@ class SynthDefBaseClass(object):
 
             try:
 
-                with open(self.filename, 'w') as f:
-                
+                with open(self.filename, "w") as f:
+
                     f.write(this_string)
 
             except IOError:
 
                 # print("Warning: Unable to update '{}' SynthDef.".format(self.name))
-                pass # TODO - add python -m --verbose to print warnings?
+                pass  # TODO - add python -m --verbose to print warnings?
 
         return
 
     def has_envelope(self):
         try:
-            object.__getattribute__(self, 'env')
+            object.__getattribute__(self, "env")
             return True
         except:
             return False
@@ -266,14 +275,18 @@ class SynthDefBaseClass(object):
             self.synth_added = True
 
             # Load to server
-            
+
             self.write()
 
             self.load()
 
         except Exception as e:
 
-            WarningMsg("{}: SynthDef '{}' could not be added to the server:\n{}".format(e.__class__.__name__, self.name, e))
+            WarningMsg(
+                "{}: SynthDef '{}' could not be added to the server:\n{}".format(
+                    e.__class__.__name__, self.name, e
+                )
+            )
 
         return None
 
@@ -287,7 +300,7 @@ class SynthDefBaseClass(object):
         return instance(name)
 
     def play(self, freq, **kwargs):
-        ''' Plays a single sound '''
+        """ Plays a single sound """
         message = ["freq", freq]
         for key, value in kwargs.items():
             message += [key, value]
@@ -295,7 +308,8 @@ class SynthDefBaseClass(object):
         return
 
     def preprocess_osc(self, osc_message):
-        osc_message['amp'] *= self.balance
+        osc_message["amp"] *= self.balance
+
 
 class SynthDef(SynthDefBaseClass):
     def __init__(self, *args, **kwargs):
@@ -309,15 +323,16 @@ class SynthDef(SynthDefBaseClass):
         self.base.append("freq = [freq, freq+fmod];")
         return
 
+
 class SampleSynthDef(SynthDefBaseClass):
     def __init__(self, *args, **kwargs):
         SynthDefBaseClass.__init__(self, *args, **kwargs)
         self.buf = self.new_attr_instance("buf")
         self.pos = self.new_attr_instance("pos")
-        self.defaults['buf']   = 0
-        self.defaults['pos']   = 0
-        self.defaults['room']  = 0.1
-        self.defaults['rate']  = 1.0
+        self.defaults["buf"] = 0
+        self.defaults["pos"] = 0
+        self.defaults["room"] = 0.1
+        self.defaults["rate"] = 1.0
         self.base.append("rate = In.kr(bus, 1);")
 
 
@@ -327,14 +342,16 @@ class FileSynthDef(SynthDefBaseClass):
         pass
 
     def __str__(self):
-        return open(self.filename, 'rb').read()
+        return open(self.filename, "rb").read()
 
-'''
+
+"""
     SynthDefProxy Class
     -------------------
 
 
-'''
+"""
+
 
 class SynthDefProxy:
     def __init__(self, name, degree, kwargs):
@@ -344,21 +361,28 @@ class SynthDefProxy:
         self.kwargs = kwargs
         self.methods = []
         self.vars = vars(self)
+
     def __str__(self):
         return "<SynthDef Proxy '{}'>".format(self.name)
+
     def __add__(self, other):
         self.mod = other
         return self
+
     def __coerce__(self, other):
         return None
+
     def __getattr__(self, name):
         if name not in self.vars:
+
             def func(*args, **kwargs):
                 self.methods.append((name, (args, kwargs)))
                 return self
+
             return func
         else:
             return getattr(self, name)
+
 
 class CompiledSynthDef(SynthDefBaseClass):
     def __init__(self, name, filename):

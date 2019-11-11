@@ -7,7 +7,7 @@ import time
 
 def enablePerfLogging():
     """ This is just a small convenience method """
-    logging.getLogger('FoxDot.perf').setLevel(logging.DEBUG)
+    logging.getLogger("FoxDot.perf").setLevel(logging.DEBUG)
 
 
 class Timing(object):
@@ -48,7 +48,7 @@ class Timing(object):
 
     """
 
-    def __init__(self, event, logger='FoxDot.perf', logargs=False):
+    def __init__(self, event, logger="FoxDot.perf", logargs=False):
         self._event = event
         self._logger = logger
         self._log = logging.getLogger(logger)
@@ -72,9 +72,9 @@ class Timing(object):
             self._log.warn("Finishing %s before start!", self)
             return
         diff = 1000 * (time.time() - self._start)
-        formatted_messages = ''
+        formatted_messages = ""
         if self._messages:
-            formatted_messages = ', '.join(self._messages) + ': '
+            formatted_messages = ", ".join(self._messages) + ": "
         self._log.debug("%s: %s%.02fms", self._event, formatted_messages, diff)
 
     def __enter__(self):
@@ -94,4 +94,5 @@ class Timing(object):
                     if kwargs:
                         timer.addMessage("kwargs:%s" % kwargs)
                 return fxn(*args, **kwargs)
+
         return wrapper
