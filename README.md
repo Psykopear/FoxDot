@@ -18,6 +18,7 @@ Other than this, there are things I want to to that could be merged into the mai
 
 ## Changes
 - Apply Black formatter to the codebase for easier reading. I avoided using it on demos and in general wherever there is code used for performances, since I don't think it's useful there.
+- Convert all the codebase to unix return characters
 
 ## Todo
 - [x] Format code with Black
