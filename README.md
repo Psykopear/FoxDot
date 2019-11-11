@@ -18,8 +18,12 @@ Other than this, there are things I want to to that could be merged into the mai
 - Remove python2 compatibility layer, since python2 is going to die [very soon](https://pythonclock.org) and the code adds complexity I don't want to deal with
 
 ## Changes
-- Apply Black formatter to the codebase for easier reading. I avoided using it on demos and in general wherever there is code used for performances, since I don't think it's useful there.
-- Convert all the codebase to unix return characters
+- Applied Black formatter to the codebase for easier reading. I avoided using it on `demos` since I don't think it's useful there.
+- Converted all the codebase to unix return characters (there was a mix of windows and unix return characters)
+- Use pipenv to handle dependencies (right now it seems only psutil is needed)
+- Start supercollider on `from FoxDot import *`. This was mostly implemented already, but not working correctly on Linux, so I just fixed it
+- Removed what seems an unnecessary `__init__.py` in the root folder
+
 
 ## Todo
 - [x] Format code with Black

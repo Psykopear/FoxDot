@@ -2,7 +2,7 @@
 
 from setuptools import setup
 
-with open("README.md", "r") as f:
+with open("README.original.md", "r") as f:
     long_description = f.read()
 
 with open("FoxDot/lib/.version", "r") as f:
