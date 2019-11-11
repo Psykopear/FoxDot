@@ -1,7 +1,5 @@
 #!/usr/bin/python
-
 """
-
 FoxDot is a Python library and programming environment that provides a fast and
 user-friendly abstraction to the powerful audio-engine, SuperCollider. It comes
 with its own IDE, which means it can be used straight out of the box; all you need
@@ -17,44 +15,39 @@ the FoxDot classes and how to implement them.
 Copyright Ryan Kirkbride 2015
 """
 
-from __future__ import absolute_import, division, print_function
+import atexit
+import datetime
+import getpass
+import os
+import platform
+import psutil
+import select
+import subprocess
+import sys
+import time
 
+
+def check_and_kill_sclang_linux():
+    for p in psutil.process_iter(attrs=["name", "cmdline"]):
+        if (p.info["name"] == "sclang") or (
+            p.info["cmdline"] and p.info["cmdline"][0] == "sclang"
+        ):
+            print("Killing running instance of sclang!")
+            p.kill()
+
+atexit.register(check_and_kill_sclang_linux)
 
 def boot_supercollider():
     """ Uses subprocesses to boot supercollider from the cli """
 
-    import time
-    import platform
-    import os
-    import subprocess
-    import getpass
-
-    try:
-        import psutil
-    except ImportError:
-        os.system("pip install psutil")
-        import sys
-
-        sys.exit("Installed psutil, please start FoxDot again.")
-
-    sclangpath = ""  # find path to sclang
-
-    thispath = ""  # find this path
-
     thisdir = os.getcwd()
-
+    arg = thisdir + "/FoxDot/startup.scd"
     OS = platform.system()
 
-    username = getpass.getuser()
-
     if OS == "Windows":
-
         print("OS: Windows")
-
         sclangloc = os.popen('where /R "C:\\Program Files" sclang.exe').read()
-
         thiscwd = str(sclangloc)
-
         ourcwd = thiscwd.replace("\\sclang.exe\n", "")
 
         def is_proc_running(name):
@@ -74,59 +67,29 @@ def boot_supercollider():
         running = is_proc_running("sclang")
 
         if running == False:
-            startup = thisdir + "/FoxDot/startup.scd"
-            # os.system("sclang"+startup+" &")
-            subprocess.Popen([sclangloc, startup], cwd=ourcwd, shell=True)
+            subprocess.Popen([sclangloc, arg], cwd=ourcwd, shell=True)
 
     elif OS == "Linux":
-
-        print("OS: Linux")
-
-        def is_proc_running(name):
-            for p in psutil.process_iter(attrs=["name", "cmdline"]):
-                # print(p);
-                procname = (
-                    p.info["name"] or p.info["cmdline"] and p.info["cmdline"][0] == name
-                )
-                if procname.startswith(name):
-                    return True
-
-        running = is_proc_running("sclang")
-
-        if running == False:
-            startup = thisdir + "/FoxDot/startup.scd"
-            # os.system('sclang "/home/foxdot/Desktop/FoxDot-Cross-Platform/FoxDot/startup.scd" &') #fuctional
-            os.system("sclang " + startup + " &")
-
+        check_and_kill_sclang_linux()
+        print("Starting sclang...")
+        process = subprocess.Popen(
+            ["sclang", arg], stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        )
+        # Now check that FoxDot actually started by
+        # waiting for at least 5 seconds of no output.
+        # TODO: We could just check that the server is responding here
+        poll_obj = select.poll()
+        poll_obj.register(process.stdout, select.POLLIN)
+        time_limit = datetime.datetime.now() + datetime.timedelta(seconds=5)
+        while datetime.datetime.now() < time_limit:
+            poll_result = poll_obj.poll(0)
     else:
         print("Operating system unrecognised")
-        # Potentially get the user to choose their OS from a list?
-        # Then run the corresponding functions
 
 
-import sys
+# Boot supercollider first
+boot_supercollider()
+print("Initializing FoxDot. Happy hacking!")
 
-if "--boot" in sys.argv:
-
-    boot_supercollider()
-
-    sys.argv.remove("--boot")
-
+# This import releases the kraken
 from .lib import *
-
-
-def main():
-    """ Function for starting the GUI when importing the library """
-    FoxDot = Workspace.workspace(FoxDotCode).run()
-
-
-def Go():
-    """ Function to be called at the end of Python files with FoxDot code in to keep
-        the TempoClock thread alive. """
-    try:
-        import time
-
-        while 1:
-            time.sleep(100)
-    except KeyboardInterrupt:
-        return

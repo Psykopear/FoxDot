@@ -7,6 +7,7 @@ I love FoxDot, and Qirky made a great job architecting the application (I never 
 That said, there are some things that are holding me from developing comfortably:
 - the code looks a bit messy and I feel it's hard to read (solution: use a formatter like [Black](missing-link))
 - it's hard to keep up with the amount of new development the original author adds to it (solution: freeze at the actual version for now, 1.8)
+- dependencies are not properly managed (solution: use pipenv to handle the few dependencies needed)
 - I need some samples that would be good for me but maybe not for everyone and since the amount of samples that can be included is limited, I'm going to swap some of the existing ones
 
 Other than this, there are things I want to to that could be merged into the main repository if the author and the community are ok with it:
@@ -22,9 +23,10 @@ Other than this, there are things I want to to that could be merged into the mai
 
 ## Todo
 - [x] Format code with Black
+- [x] Use pipenv to handle dependencies
+- [x] Start supercollider server from within FoxDot
 - [ ] Remove GUI code (can be recovered from the original repo if needed)
-- [ ] Start supercollider server from within FoxDot
 - [ ] Adjust present synths' sound design
 - [ ] New synths design
 - [ ] New drums samples design
-- [ ] Control parameters or entrie instruments via an external midi controller
+- [ ] Control parameters or entire instruments via an external midi controller

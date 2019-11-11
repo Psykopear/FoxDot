@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 import os.path
 
 with open((os.path.join(os.path.dirname(__file__), ".version")), "r") as f:
@@ -51,7 +49,7 @@ def __getitem__(self, key):
 
 
 def player_method(f):
-    """ Decorator for assigning functions as Player methods. 
+    """ Decorator for assigning functions as Player methods.
 
     >>> @player_method
     ... def test(self):
@@ -115,7 +113,7 @@ def futureBar(n=0):
 
 
 def update_foxdot_clock(clock):
-    """ Tells the TimeVar, Player, and MidiIn classes to use 
+    """ Tells the TimeVar, Player, and MidiIn classes to use
         a new instance of TempoClock. """
 
     assert isinstance(clock, TempoClock)
@@ -260,5 +258,4 @@ PatternMethods = Pattern.get_methods()
 PatternTypes = functions(Patterns.Sequences)
 
 # Start
-
 Clock.start()

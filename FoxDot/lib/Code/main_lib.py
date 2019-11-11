@@ -52,7 +52,7 @@ class LiveObject(object):
     FoxCode
     =======
     Handles the execution of FoxDot code
-    
+
 """
 
 
@@ -118,7 +118,7 @@ class FoxDotCode:
 
     @classmethod
     def use_sample_directory(cls, directory):
-        """ Forces FoxDot to look in `directory` instead of the default 
+        """ Forces FoxDot to look in `directory` instead of the default
             directory when using audio samples. """
         return cls.namespace["symbolToDir"].set_root(directory)
 
@@ -286,7 +286,6 @@ def write_to_file(fn, text):
 
 
 # These functions return information about an imported module
-
 # Should use insepct module
 
 
