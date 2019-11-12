@@ -7,10 +7,6 @@
     installed and Python on your path.
 
 """
-
-
-from __future__ import absolute_import, division, print_function
-
 from .lib import FoxDotCode, handle_stdin
 from .lib.Workspace import workspace
 
@@ -50,57 +46,34 @@ parser.add_argument(
 args = parser.parse_args()
 
 if args.dir:
-
     try:
-
         # Use given directory
-
         FoxDotCode.use_sample_directory(args.dir)
-
     except OSError as e:
-
         # Exit with last error
-
         import sys, traceback
-
         sys.exit(traceback.print_exc(limit=1))
 
 if args.startup:
-
     try:
-
         FoxDotCode.use_startup_file(args.startup)
-
     except OSError as e:
-
         import sys, traceback
-
         sys.exit(traceback.print_exc(limit=1))
 
 if args.no_startup:
-
     FoxDotCode.no_startup()
 
 if args.boot:
-
     FoxDotCode.boot_supercollider()
 
 if args.pipe:
-
     # Just take commands from the CLI
-
     handle_stdin()
-
 else:
-
     # Open the GUI
-
     if args.simple:
-
         from .lib.Workspace.Simple import workspace
-
     else:
-
         from .lib.Workspace import workspace
-
     FoxDot = workspace(FoxDotCode).run()

@@ -35,7 +35,7 @@ def check_and_kill_sclang_linux():
             print("Killing running instance of sclang!")
             p.kill()
 
-atexit.register(check_and_kill_sclang_linux)
+# atexit.register(check_and_kill_sclang_linux)
 
 def boot_supercollider():
     """ Uses subprocesses to boot supercollider from the cli """
@@ -88,7 +88,7 @@ def boot_supercollider():
 
 
 # Boot supercollider first
-boot_supercollider()
+# boot_supercollider()
 print("Initializing FoxDot. Happy hacking!")
 
 # This import releases the kraken
