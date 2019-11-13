@@ -35,11 +35,10 @@ def check_and_kill_sclang_linux():
             print("Killing running instance of sclang!")
             p.kill()
 
-# atexit.register(check_and_kill_sclang_linux)
 
 def boot_supercollider():
     """ Uses subprocesses to boot supercollider from the cli """
-
+    atexit.register(check_and_kill_sclang_linux)
     thisdir = os.getcwd()
     arg = thisdir + "/FoxDot/startup.scd"
     OS = platform.system()
@@ -52,7 +51,6 @@ def boot_supercollider():
 
         def is_proc_running(name):
             for p in psutil.process_iter(attrs=["name", "exe", "cmdline"]):
-                # print(p);
                 procname = (
                     p.info["name"]
                     or p.info["exe"]
@@ -87,7 +85,7 @@ def boot_supercollider():
         print("Operating system unrecognised")
 
 
-# Boot supercollider first
+# Boot supercollider first?
 # boot_supercollider()
 print("Initializing FoxDot. Happy hacking!")
 
