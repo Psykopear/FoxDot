@@ -8,7 +8,6 @@
 
 """
 from .lib import FoxDotCode, handle_stdin
-from .lib.Workspace import workspace
 
 import argparse
 
@@ -70,10 +69,3 @@ if args.boot:
 if args.pipe:
     # Just take commands from the CLI
     handle_stdin()
-else:
-    # Open the GUI
-    if args.simple:
-        from .lib.Workspace.Simple import workspace
-    else:
-        from .lib.Workspace import workspace
-    FoxDot = workspace(FoxDotCode).run()

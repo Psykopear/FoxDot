@@ -1,9 +1,9 @@
+import logging
 import os.path
 
 with open((os.path.join(os.path.dirname(__file__), ".version")), "r") as f:
     __version__ = f.read()
 
-import logging
 from .Code import *
 
 FoxDotCode.namespace = globals()
@@ -22,10 +22,8 @@ from .ServerManager import *
 from .SCLang import SynthDefs, Env, SynthDef, CompiledSynthDef
 from .Root import Root
 from .Scale import Scale, Tuning
-from .Workspace import get_keywords
 
 # stdlib imports
-
 from random import choice as choose
 
 # Define any custom functions

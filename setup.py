@@ -24,8 +24,6 @@ setup(
         "FoxDot.lib.Extensions",
         "FoxDot.lib.Extensions.VRender",
         "FoxDot.lib.Extensions.SonicPi",
-        "FoxDot.lib.Workspace",
-        "FoxDot.lib.Workspace.Simple",
         "FoxDot.lib.EspGrid",
         "FoxDot.lib.Effects",
         "FoxDot.lib.Patterns",
@@ -58,7 +56,6 @@ setup(
             "lib/.version",
             "README.md",
         ],
-        "FoxDot.lib.Workspace": ["img/*", "tmp/*"],
         "FoxDot.lib.Settings": ["conf.txt"],
     },
 )

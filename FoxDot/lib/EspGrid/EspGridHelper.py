@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 from ..ServerManager import BidirectionalOSCServer, OSCMessage
 
 
@@ -19,7 +17,6 @@ class EspGrid:
 
     def _reset_clock(self, *args):
         self.metro.reset()
-        return
 
     def set_clock_mode(self, value):
         message = OSCMessage("/esp/clockMode/s")

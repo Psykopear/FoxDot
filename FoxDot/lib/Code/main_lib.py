@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 import sys
 import re
 import os.path
@@ -8,11 +6,8 @@ from traceback import format_exc as error_stack
 from types import CodeType, FunctionType
 
 try:
-
     from types import TypeType
-
 except ImportError:
-
     TypeType = type
 
 from ..Utils import modi
