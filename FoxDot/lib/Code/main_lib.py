@@ -2,6 +2,7 @@ import sys
 import re
 import os.path
 import time
+
 from traceback import format_exc as error_stack
 from types import CodeType, FunctionType
 
@@ -269,15 +270,6 @@ def load_startup_file():
 
 def WarningMsg(*text):
     print("Warning: {}".format(" ".join(str(s) for s in text)))
-
-
-def write_to_file(fn, text):
-    try:
-        with open(fn, "w") as f:
-            f.write(clean(text))
-    except IOError:
-        print("Unable to write to {}".format(fn))
-    return
 
 
 # These functions return information about an imported module

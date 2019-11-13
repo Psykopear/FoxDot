@@ -218,39 +218,26 @@ class SynthDefBaseClass(object):
 
     # Adding the SynthDef to the Server
     # ---------------------------------
-
     def write(self):
-        """  Writes the SynthDef to file """
-        # 1. See if the file exists
+        """  Doesn't write the SynthDef to file """
+        # # 1. See if the file exists
 
-        if os.path.isfile(self.filename):
+        # if os.path.isfile(self.filename):
+        #     with open(self.filename) as f:
+        #         contents = f.read()
+        # else:
+        #     contents = ""
 
-            with open(self.filename) as f:
-
-                contents = f.read()
-
-        else:
-
-            contents = ""
-
-        # 2. If it does, check contents
-
-        this_string = self.__str__()
-
-        if contents != this_string:
-
-            try:
-
-                with open(self.filename, "w") as f:
-
-                    f.write(this_string)
-
-            except IOError:
-
-                # print("Warning: Unable to update '{}' SynthDef.".format(self.name))
-                pass  # TODO - add python -m --verbose to print warnings?
-
-        return
+        # # 2. If it does, check contents
+        # this_string = self.__str__()
+        # if contents != this_string:
+        #     try:
+        #         with open(self.filename, "w") as f:
+        #             f.write(this_string)
+        #     except IOError:
+        #         # print("Warning: Unable to update '{}' SynthDef.".format(self.name))
+        #         pass  # TODO - add python -m --verbose to print warnings?
+        pass
 
     def has_envelope(self):
         try:
@@ -265,29 +252,19 @@ class SynthDefBaseClass(object):
 
     def add(self):
         """ This is required to add the SynthDef to the SuperCollider Server """
-
         if self.has_envelope():
-
             self.osc = self.osc * self.env
-
         try:
-
             self.synth_added = True
-
             # Load to server
-
             self.write()
-
             self.load()
-
         except Exception as e:
-
             WarningMsg(
                 "{}: SynthDef '{}' could not be added to the server:\n{}".format(
                     e.__class__.__name__, self.name, e
                 )
             )
-
         return None
 
     def rename(self, newname):

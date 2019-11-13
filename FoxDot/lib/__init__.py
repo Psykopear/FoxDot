@@ -113,29 +113,19 @@ def futureBar(n=0):
 def update_foxdot_clock(clock):
     """ Tells the TimeVar, Player, and MidiIn classes to use
         a new instance of TempoClock. """
-
     assert isinstance(clock, TempoClock)
-
     for item in (TimeVar, Player, MidiIn):
-
         item.set_clock(clock)
-
     clock.add_method(_convert_json_bpm)
-
-    return
 
 
 def update_foxdot_server(serv):
     """ Tells the `Effect` and`TempoClock`classes to send OSC messages to
         a new ServerManager instance.
     """
-
     assert isinstance(serv, ServerManager)
-
     TempoClock.set_server(serv)
     SynthDefs.set_server(serv)
-
-    return
 
 
 def instantiate_player_objects():
@@ -144,22 +134,14 @@ def instantiate_player_objects():
     numbers = list("0123456789")
 
     for char1 in alphabet:
-
         group = []
-
         for char2 in alphabet + numbers:
-
             arg = char1 + char2
-
             FoxDotCode.namespace[arg] = EmptyPlayer(arg)
-
             group.append(arg)
-
         FoxDotCode.namespace[char1 + "_all"] = Group(
             *[FoxDotCode.namespace[char1 + str(n)] for n in range(10)]
         )
-
-    return
 
 
 def _reload_synths():
@@ -171,7 +153,6 @@ def _reload_synths():
     reload(SCLang._SynthDefs)
     reload(Effects)
     Samples._reset_buffers()
-    return
 
 
 def foxdot_reload():
@@ -179,7 +160,6 @@ def foxdot_reload():
     SynthDefs.reload()
     FxList.reload()
     Samples.reset()
-    return
 
 
 def _convert_json_bpm(clock, data):
@@ -212,10 +192,6 @@ def allow_connections(valid=True, *args, **kwargs):
     else:
         Clock.kill_tempo_server()
         print("Closed connections")
-    return
-
-
-# Util class
 
 
 class _util:
@@ -237,9 +213,9 @@ class _util:
 FoxDot = _util()
 
 # Create a clock and define functions
-
 logging.basicConfig(level=logging.ERROR)
-when.set_namespace(FoxDotCode)  # experimental
+# experimental
+when.set_namespace(FoxDotCode)
 
 _Clock = Clock = TempoClock()
 

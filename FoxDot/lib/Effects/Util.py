@@ -11,7 +11,7 @@
     ::
         # Example. Reverb effect "title" is `room` and attribute is `mix`, which
         # defaults to 0.25. The following adds a reverb effect
-        
+
         p1 >> pads(room=0.5)
 
         # This still adds the effect, but a mix of 0 doesn't actually do anything
@@ -23,7 +23,7 @@
         p1 >> pads(room=0, mix=0.5)
 
     Other effects are outlined below:
-    
+
     *High Pass Filter* - Title keyword: `hpf`, Attribute keyword(s): `hpr`
     Only frequences **above** the value of `hpf` are kept in the final signal. Use `hpr` to set the resonance (usually a value between 0 and 1)
 
@@ -51,7 +51,7 @@
     *Panning* - Title keyword: `pan`, Attribute keyword(s):
     Panning, where -1 is far left, 1 is far right (defaults to 0)
 
-    *Vibrato* - Title keyword: `vib`, Attribute keyword(s): 
+    *Vibrato* - Title keyword: `vib`, Attribute keyword(s):
     Vibrato (defaults to 0)
 
     Undocumented: Spin, Shape, Formant, BandPassFilter, Echo
@@ -126,38 +126,22 @@ class Effect:
         return
 
     def save(self):
-        """ writes to file and sends to server """
-
-        # 1. See if the file exists
-
-        if os.path.isfile(self.filename):
-
-            with open(self.filename) as f:
-
-                contents = f.read()
-
-        else:
-
-            contents = ""
-
-        # 2. If it does, check contents
-
-        this_string = self.__str__()
-
-        if contents != this_string:
-
-            try:
-
-                with open(self.filename, "w") as f:
-
-                    f.write(this_string)
-
-            except IOError:
-
-                print("IOError: Unable to update '{}' effect.".format(self.synthdef))
-
+        """ doesn't write to file and sends to server """
+        # # 1. See if the file exists
+        # if os.path.isfile(self.filename):
+        #     with open(self.filename) as f:
+        #         contents = f.read()
+        # else:
+        #     contents = ""
+        # # 2. If it does, check contents
+        # this_string = self.__str__()
+        # if contents != this_string:
+        #     try:
+        #         with open(self.filename, "w") as f:
+        #             f.write(this_string)
+        #     except IOError:
+        #         print("IOError: Unable to update '{}' effect.".format(self.synthdef))
         # 3. Send to server
-
         self.load()
 
     def load(self):
