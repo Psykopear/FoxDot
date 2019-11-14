@@ -34,7 +34,6 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     entry_points={"gui_scripts": ["FoxDot = FoxDot.__init__:main"]},
-    # data_files=[('', 'LICENSE')],
     package_data={
         "FoxDot": [
             "snd/*/*/*.*",
@@ -49,7 +48,6 @@ setup(
             "osc/*.scd",
             "osc/sceffects/*.scd",
             "osc/scsyndef/*.scd",
-            "demo/*.py",
             "rec/.null",
             "lib/Extensions/*/*.*",
             "lib/Extensions/*/*/*.*",
