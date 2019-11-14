@@ -17,19 +17,23 @@ Other than this, there are things I want to to that could be merged into the mai
 - I'd like to start Supercollider from within FoxDot, so I don't have to fire up the instance separately
 - Remove python2 compatibility layer, since python2 is going to die [very soon](https://pythonclock.org) and the code adds complexity I don't want to deal with
 
+## Ideas
+I think I will extract FoxDot as a standalone library, separated from both the GUI and the sclang code generation process (these two can be two projects on their own)
+
+
 ## Changes
 - Applied Black formatter to the codebase for easier reading. I avoided using it on `demos` since I don't think it's useful there.
 - Converted all the codebase to unix return characters (there was a mix of windows and unix return characters)
 - Use pipenv to handle dependencies (right now it seems only psutil is needed)
 - Start supercollider on `from FoxDot import *`. This was mostly implemented already, but not working correctly on Linux, so I just fixed it
 - Removed what seems an unnecessary `__init__.py` in the root folder
-
+- Removed Workspace directory and references
 
 ## Todo
 - [x] Format code with Black
 - [x] Use pipenv to handle dependencies
 - [x] Start supercollider server from within FoxDot
-- [ ] Remove GUI code (can be recovered from the original repo if needed)
+- [x] Remove GUI code (can be recovered from the original repo if needed)
 - [ ] Adjust present synths' sound design
 - [ ] New synths design
 - [ ] New drums samples design
