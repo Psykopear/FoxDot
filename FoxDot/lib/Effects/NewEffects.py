@@ -72,27 +72,6 @@ def slideFrom(slide_from=0, sus=1, slide_delay=0):
     return Effect.Out(osc)
 
 
-# fx = FxList.new("glide", "glissando", {"glide": 0, "glide_delay": 0.5, "sus": 1}, order=0)
-# fx.add("osc = osc * EnvGen.ar(Env([1, 1, (1.059463**glide)], [sus*glide_delay, sus*(1-glide_delay)]))")
-# fx.save()
-
-# fx = FxList.new("bend", "pitchBend", {"bend": 0, "sus": 1, "benddelay": 0}, order=0)
-# fx.add("osc = osc * EnvGen.ar(Env([1, 1, 1 + bend, 1], [sus * benddelay, (sus*(1-benddelay)/2), (sus*(1-benddelay)/2)]))")
-# fx.save()
-
-# fx = FxList.new("coarse", "coarse", {"coarse": 0, "sus": 1}, order=0)
-# fx.add("osc = osc * LFPulse.ar(coarse / sus)")
-# fx.save()
-
-# fx = FxList.new("striate", "striate", {"striate": 0, "sus": 1, "buf": 0, "rate": 1}, order=0)
-# fx.add("osc = osc * LFPulse.ar(striate / sus, width:  (BufDur.kr(buf) / rate) / sus)")
-# fx.save()
-
-# fx = FxList.new("pshift", "pitchShift", {"pshift":0}, order=0)
-# fx.add("osc = osc * (1.059463**pshift)")
-# fx.save()
-
-
 @Effect(order=2)
 def formantFilter(formant=0):
     Effect.add(formant=(formant % 8) + 1)

@@ -12,6 +12,7 @@ from ..Utils import *
 
 import functools
 import inspect
+import random
 
 # Decorator functions for nested expansion of pattern functions and methods
 
@@ -120,31 +121,19 @@ class metaPattern(object):
     meta = []
 
     def __init__(self, *args):
-
         if len(args):
-
             data = args[0]
-
             if type(data) is str:
-
                 self.fromString(data)
-
             elif type(data) is tuple:
-
                 self.data = PGroup(data)
                 self.make()
-
             elif isinstance(data, self.__class__):
-
                 self.data = data.data
-
             else:
-
                 self.data = data
                 self.make()
-
         else:
-
             self.data = []
 
     def new(self, data):
@@ -806,11 +795,8 @@ class metaPattern(object):
 
         """
         a = int(a)
-
         if a < 0:
-
             a, b = 0, a
-
         return self | self.mirror()[a:b]
 
     def alt(self, other):
@@ -878,8 +864,8 @@ class metaPattern(object):
         return self.new(new)
 
     def compress(self, selector):
-        """ Removes values from the pattern if the same index in selector is 0. 
-            Similar to .select() but maximum length of the new Pattern is the 
+        """ Removes values from the pattern if the same index in selector is 0.
+            Similar to .select() but maximum length of the new Pattern is the
             length of the initial Pattern.  """
         s = asStream(selector)
         return self.new([self[i] for i in range(len(self)) if s[i]])
@@ -896,11 +882,7 @@ class metaPattern(object):
         """ Zips a pattern with a modified version of itself. Method argument
             can be a function that takes this pattern as its first argument,
             or the name of a Pattern method as a string. """
-
         if callable(method):
-            # func = method
-            # args = [self.data] + list(args)
-            # func =
             return self.zip(list(map(method, self.data)))
         else:
             func = getattr(self, method)
@@ -924,12 +906,10 @@ class metaPattern(object):
     def extend(self, seq):
         """ Should return None """
         self.data.extend(map(convert_nested_data, seq))
-        return
 
     def append(self, item):
         """ Converts a new item to PGroup etc and appends """
         self.data.append(convert_nested_data(item))
-        return
 
     def i_rotate(self, n=1):
         self.data = self.data[n:] + self.data[0:n]
@@ -959,7 +939,7 @@ class metaPattern(object):
 
     def all(self, func=(lambda x: bool(x))):
         """ Returns true if all of the patterns contents satisfies func(x) - default is nonzero """
-        if len(self.data) is 0:
+        if len(self.data) == 0:
             return False
 
         for item in self.data:
@@ -998,36 +978,23 @@ class metaPattern(object):
         """ Zips two patterns together. If one item is a tuple, it extends the tuple / PGroup
             i.e. arrow_zip([(0,1),3], [2]) -> [(0,1,2),(3,2)]
         """
-
         output = Pattern()
-
         other = asStream(other)
-
         dtype = PGroup if dtype is None else dtype
 
         for i in range(LCM(len(self), len(other))):
-
             item1 = self.getitem(i, get_generator=True)
             item2 = other.getitem(i, get_generator=True)
 
             if all([x.__class__ == PGroup for x in (item1, item2)]):
-
                 new_item = dtype(item1.data + item2.data)
-
             elif item1.__class__ == PGroup:
-
                 new_item = dtype(item1.data + [item2])
-
             elif item2.__class__ == PGroup:
-
                 new_item = dtype([item1] + item2.data)
-
             else:
-
                 new_item = dtype(item1, item2)
-
             output.append(new_item)
-
         return output
 
     def deepzip(self, other):
@@ -1073,39 +1040,26 @@ class metaPattern(object):
 
     def make(self):
         """ This method automatically laces and groups the data """
-
         #: Force data into an iterable form
         if isinstance(self.data, str):
-
             self.data = list(self.data)
-
         elif not isinstance(self.data, PatternType):  # not sure about PlayString data
-
             self.data = [self.data]
-
         self.data = list(map(convert_nested_data, self.data))
 
         # If this only contains a pattern, its redundant to use this as a container
-
         if len(self.data) == 1:
-
             if isinstance(self.data[0], Pattern):
-
                 self.data = self.data[0].data
-
             # Replace this pattern with a Pvar if it is the only item in the Pattern itself
-
             elif isinstance(self.data[0], Pattern.Pvar):  # SUPER HACKY
-
                 self.__class__ = self.data[0].__class__
                 self.__dict__ = self.data[0].__dict__.copy()
-
         return self
 
 
 class Pattern(metaPattern):
     """ Base type pattern """
-
     WEIGHT = 0
     debug = False
 
@@ -1124,7 +1078,6 @@ class PGroup(metaPattern):
     """
         Class to represent any groupings of notes as denoted by brackets.
         PGroups should only be found within a Pattern object.
-        
     """
 
     WEIGHT = 2
@@ -1133,32 +1086,20 @@ class PGroup(metaPattern):
     ignore = 0
 
     def __init__(self, seq=[], *args):
-
         if not args:
-
             if isinstance(seq, metaPattern):
-
                 seq = seq.data
-
             elif isinstance(seq, tuple):
-
                 seq = list(seq)
         else:
-
             seq = [seq] + list(args)
-
         metaPattern.__init__(self, seq)
 
         # If the PGroup contains patterns, invert it to a Pattern of PGroups
-
         l = [len(p) for p in self.data if isinstance(p, Pattern)]
-
         if len(l) > 0:
-
             new_data = []
-
             for key in range(LCM(*l)):
-
                 new_data.append(
                     self.__class__(
                         [
@@ -1167,9 +1108,7 @@ class PGroup(metaPattern):
                         ]
                     )
                 )
-
             self.__class__ = Pattern
-
             self.data = new_data
 
     def merge(self, value):
@@ -1265,9 +1204,7 @@ class PGroup(metaPattern):
     @staticmethod
     def _update_delay(event, delay):
         """ Updates the delay value in the event dictionary """
-
         event["delay"] = sum_delays(event["delay"], delay)
-
         return event
 
     @staticmethod
@@ -1381,9 +1318,6 @@ class PGroup(metaPattern):
                 item = int(item)
             values.append(item)
         return self.new(values)
-
-
-import random
 
 
 class GeneratorPattern:
@@ -1538,42 +1472,6 @@ class GeneratorPattern:
         """
         return self.transform(lambda value: mapping.get(value, default))
 
-        # TODO - handle callables
-        # funcs = {}
-
-        # for key, value in mapping.items():
-
-        #     # We can map using a function
-
-        #     if callable(key) and callable(value):
-
-        #         funcs[partial(lambda: key(self.now()))]  = partial(lambda: value(self.now()))
-
-        #     elif callable(key) and not callable(value):
-
-        #         funcs[partial(lambda: key(self.now()))]  = partial(lambda e: e, value)
-
-        #     elif callable(value):
-
-        #         funcs[partial(lambda e: self.now() == e, key)] = partial(lambda: value(self.now()))
-
-        #     else:
-        #         # one-to-one mapping
-        #         funcs[partial(lambda e: self.now() == e, key)] = partial(lambda e: e, value)
-
-        # def mapping_function(a, b):
-        #     for func, result in funcs.items():
-        #         if bool(func()) is True:
-        #             value = result()
-        #             break
-        #     else:
-        #         value = default
-        #     return value
-
-        # new = self.child(0)
-        # new.calculate = mapping_function
-        # return new
-
 
 class PatternContainer(metaPattern):
     def getitem(self, key, *args):
@@ -1604,7 +1502,6 @@ class EmptyItem(object):
 """
 
 # Used to force any non-pattern data into a Pattern
-
 PatternType = (Pattern, list)
 
 
@@ -1628,21 +1525,13 @@ Format = PatternFormat  ## TODO - Remove this
 
 def convert_nested_data(data):
     """ Converts a piece of data in a pattern to a PGroup/Pattern as appropriate """
-
     if isinstance(data, (int, float)):
-
         return data
-
     elif type(data) is tuple:
-
         return PGroup(data)
-
     elif type(data) is list or (type(data) is str and len(data) > 1):
-
         return Pattern(data)
-
     else:
-
         return data
 
 
@@ -1721,21 +1610,15 @@ def sum_delays(a, b):
         return a
 
     if not isinstance(a, PGroup):
-
         a = PGroup(a)
-
     if not isinstance(b, PGroup):
-
         b = PGroup(b)
 
     sml, lrg = sorted((a, b), key=lambda x: len(x))
 
     if all([item in lrg for item in sml]):
-
         value = lrg
-
     else:
-
         value = a + b
 
     return value if len(value) > 1 else value[0]

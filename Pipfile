@@ -6,9 +6,17 @@ verify_ssl = true
 [dev-packages]
 ipython = "*"
 ipdb = "*"
+python-language-server = "*"
+rope = "*"
+jedi = "*"
+pynvim = "*"
+black = "*"
 
 [packages]
 psutil = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
