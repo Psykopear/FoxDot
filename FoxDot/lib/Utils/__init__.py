@@ -4,12 +4,10 @@
     but used in multiple sub-packages of FoxDot.
 
 """
-
-from __future__ import absolute_import, division, print_function
-
 import sys
 import json
 import itertools
+
 from socket import timeout as socket_timeout
 
 try:
@@ -19,8 +17,6 @@ except ImportError:
     from urllib2 import urlopen, URLError
 
 # Functions
-
-
 def get_pypi_version():
     """ Returns the most up-to-date version number on PyPI. Return None on error """
     try:
@@ -50,20 +46,17 @@ def sliceToRange(s):
 
 def LCM(*args):
     """ Lowest Common Multiple """
-
     args = [n for n in args if n != 0]
 
     # Base case
     if len(args) == 0:
         return 1
-
     elif len(args) == 1:
         return args[0]
 
     X = list(args)
 
     while any([X[0] != K for K in X]):
-
         i = X.index(min(X))
         X[i] += args[i]
 
@@ -78,15 +71,11 @@ def EuclidsAlgorithm(n, k, lo=0, hi=1):
     data = [[hi if i < n else lo] for i in range(k)]
 
     while True:
-
         k = k - n
-
         if k <= 1:
             break
-
         elif k < n:
             n, k = k, n
-
         for i in range(n):
             data[i] += data[-1]
             del data[-1]
@@ -97,22 +86,14 @@ def EuclidsAlgorithm(n, k, lo=0, hi=1):
 def PulsesToDurations(data):
     """ Returns a list of durations based on pulses (1s) and blanks (0s).
         Data should be a list of [1,0] where 1 is a pulse. """
-
     count, seq = 1, []
-
     for item in data[1:]:
-
         if item == 1:
-
             seq.append(count)
             count = 1
-
         else:
-
             count += 1
-
     seq.append(count)
-
     return seq
 
 
@@ -188,8 +169,6 @@ def recursive_any(seq):
 
 
 # Classes
-
-
 class dots:
     """ Class for representing long Patterns in strings """
 

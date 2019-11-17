@@ -34,6 +34,7 @@ FOXDOT_SND = os.path.realpath(FOXDOT_ROOT + "/snd/")
 FOXDOT_LOOP = os.path.realpath(FOXDOT_ROOT + "/snd/_loop_/")
 
 SCLANG_EXEC = "sclang.exe" if SYSTEM == WINDOWS else "sclang"
+SC_DIRECTORY = ""
 SYNTHDEF_DIR = os.path.realpath(FOXDOT_ROOT + "/osc/scsyndef/")
 EFFECTS_DIR = os.path.realpath(FOXDOT_ROOT + "/osc/sceffects/")
 ENVELOPE_DIR = os.path.realpath(FOXDOT_ROOT + "/osc/scenvelopes/")

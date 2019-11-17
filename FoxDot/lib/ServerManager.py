@@ -1,21 +1,37 @@
 """ Handles OSC messages being sent to SuperCollider.
 """
-import itertools
 import json
 import os.path
 import queue
 import socket
-import sys
-import sys
 import threading
 import time
+import subprocess
 
 from collections import namedtuple
+from time import sleep
 from threading import Thread
 
 from .Code import WarningMsg
-from .Settings import *
-from .OSC3 import *
+from .OSC3 import OSCClient, OSCClientError, OSCServer, getRegEx, OSCBundle, OSCMessage
+from .Settings import (
+    FOXDOT_BUFFERS_FILE,
+    FOXDOT_INFO_FILE,
+    FOXDOT_OSC_FUNC,
+    FOXDOT_RECORD_FILE,
+    FOXDOT_STARTUP_FILE,
+    GET_FX_FILES,
+    GET_SC_INFO,
+    GET_SYNTHDEF_FILES,
+    LoopPlayer,
+    OSC_MIDI_ADDRESS,
+    RECORDING_DIR,
+    SCLANG_EXEC,
+    SC_DIRECTORY,
+    SamplePlayer,
+    USER_CWD,
+    get_timestamp,
+)
 
 # XXX: Keep in sync with Info.scd
 ServerInfo = namedtuple(
@@ -43,10 +59,11 @@ class OSCClientWrapper(OSCClient):
         """ Sends the message given but prints errors instead of raising them """
         try:
             OSCClient.send(*args, **kwargs)
-        except OSCClientError as e:
+        except OSCClientError:
             if not OSCClientWrapper.error_printed:
                 print(
-                    "Error sending message to SuperCollider server instance: make sure FoxDot quark is running and try again."
+                    "Error sending message to SuperCollider server instance: "
+                    "make sure FoxDot quark is running and try again."
                 )
                 OSCClientWrapper.error_printed = True
 
@@ -108,7 +125,7 @@ class BidirectionalOSCServer(OSCServer):
     def send(self, *args, **kwargs):
         try:
             self.client.send(*args, **kwargs)
-        except OSCClientError as e:
+        except OSCClientError:
             if not self._printed_error:
                 print("Error: No connection made to SuperCollider server instance.")
                 self._printed_error = True
@@ -134,7 +151,8 @@ class BidirectionalOSCServer(OSCServer):
             now = time.time()
 
 
-#  Create an abstract base class that could be sub-classed for users who want to send their OSC messages elsewhere
+# Create an abstract base class that could be
+# sub-classed for users who want to send their OSC messages elsewhere
 
 
 class ServerManager(object):
@@ -376,7 +394,7 @@ class SCLangServerManager(ServerManager):
                     new_message[key] = float(
                         packet[key]
                     )  # is this not already the case?
-                except (TypeError, ValueError) as e:
+                except (TypeError, ValueError):
                     WarningMsg(
                         "Could not convert '{}' argument '{}' to float. Set to 0".format(
                             key, packet[key]
@@ -442,7 +460,7 @@ class SCLangServerManager(ServerManager):
 
         try:
             dest = env.get_env_name()
-        except AttributeError as e:
+        except AttributeError:
             # Set the curve value
             env_packet["curve"] = env
             dest = "BasicEnvelope"
@@ -504,7 +522,10 @@ class SCLangServerManager(ServerManager):
         return msg, node
 
     def get_bundle(self, synthdef, packet, timestamp=0):
-        """ Returns the OSC Bundle for a notew based on a Player's SynthDef, and event and effects dictionaries """
+        """
+        Returns the OSC Bundle for a notew based on a Player's SynthDef,
+        and event and effects dictionaries
+        """
         # Create a specific message for midi.
         # This should be in a dict of synthdef to functions maybe? we need a "nudge to sync"
         if synthdef == "MidiOut":
@@ -717,6 +738,7 @@ except ImportError:
 
 class Message:
     """ Wrapper for JSON messages sent to the server """
+
     def __init__(self, data):
         self.data = data
 
@@ -764,6 +786,7 @@ def send_to_socket(sock, data):
 
 class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     """ Base class """
+
     pass
 
 

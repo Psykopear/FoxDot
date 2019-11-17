@@ -11,6 +11,7 @@ rope = "*"
 jedi = "*"
 pynvim = "*"
 black = "*"
+flake8 = "*"
 
 [packages]
 psutil = "*"

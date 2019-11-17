@@ -59,9 +59,6 @@ def player_method(f):
     return getattr(Player, f.__name__)
 
 
-PlayerMethod = player_method  # Temporary alias
-
-
 def _futureBarDecorator(n, multiplier=1):
     if callable(n):
 
@@ -92,9 +89,6 @@ def next_bar(n=0):
     ...     v1.solo()
     """
     return _futureBarDecorator(n)
-
-
-nextBar = next_bar  # temporary alias
 
 
 def futureBar(n=0):

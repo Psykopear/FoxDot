@@ -87,7 +87,7 @@ def boot_supercollider():
 
 # Boot supercollider first?
 # boot_supercollider()
-print("Initializing FoxDot. Happy hacking!")
 
 # This import releases the kraken
 from .lib import *
+print("FoxDot initialized. Happy hacking!")

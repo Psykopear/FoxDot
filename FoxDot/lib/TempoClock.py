@@ -2,17 +2,17 @@
     Clock management for scheduling notes and functions. Anything 'callable', such as a function
     or instance with a `__call__` method, can be scheduled. An instance of `TempoClock` is created
     when FoxDot started up called `Clock`, which is used by `Player` instances to schedule musical
-    events. 
+    events.
 
     The `TempoClock` is also responsible for sending the osc messages to SuperCollider. It contains
     a queue of event blocks, instances of the `QueueBlock` class, which themselves contain queue
     items, instances of the `QueueObj` class, which themseles contain the actual object or function
-    to be called. The `TempoClock` is continually running and checks if any queue block should 
+    to be called. The `TempoClock` is continually running and checks if any queue block should
     be activated. A queue block has a "beat" value for which its contents should be activated. To make
     sure that events happen on time, the `TempoClock` will begin processing the contents 0.25
-    seconds before it is *actually* meant to happen in case there is a large amount to process.  When 
+    seconds before it is *actually* meant to happen in case there is a large amount to process.  When
     a queue block is activated, a new thread is created to process all of the callable objects it
-    contains. If it calls a `Player` object, the queue block keeps track of the OSC messages generated 
+    contains. If it calls a `Player` object, the queue block keeps track of the OSC messages generated
     until all `Player` objects in the block have been called. At this point the thread is told to
     sleep until the remainder of the 0.25 seconds has passed. This value is stored in `Clock.latency`
     and is adjustable. If you find that there is a noticeable jitter between events, i.e. irregular
@@ -24,7 +24,7 @@
     bound to the shortcut key, `Ctrl+.`. You can schedule non-player objects in the clock by
     using `Clock.schedule(func, beat, args, kwargs)`. By default `beat` is set to the next
     bar in the clock, but you use `Clock.now() + n` or `Clock.next_bar() + n` to schedule a function
-    in the future at a specific time. 
+    in the future at a specific time.
 
     To change the tempo of the clock, just set the bpm attribute using `Clock.bpm=val`. The change
     in tempo will occur at the start of the next bar so be careful if you schedule this action within
@@ -50,7 +50,6 @@ import sys
 import threading
 import time
 
-from fractions import Fraction
 from traceback import format_exc as error_stack
 from types import FunctionType, MethodType
 
@@ -60,7 +59,7 @@ from .Patterns import asStream
 from .Players import Player
 from .Repeat import MethodCall
 from .ServerManager import TempoClient, ServerManager, RequestTimeout
-from .Settings import CPU_USAGE, CLOCK_LATENCY
+from .Settings import CPU_USAGE
 from .TimeVar import TimeVar
 from .Utils import modi
 
@@ -153,16 +152,12 @@ class TempoClock(object):
 
         self.espgrid.set_clock_mode(2)
         self.schedule(lambda: self._espgrid_update_tempo(True))
-        # self._espgrid_update_tempo(True) # could schedule this for next bar?
-        return
 
     def _espgrid_update_tempo(self, force=False):
         """ Retrieves the current tempo from EspGrid and updates internal values """
-
         data = self.espgrid.get_tempo()
 
         # If the tempo hasn't been started, start it here and get updated data
-
         if data[0] == 0:
             self.espgrid.start_tempo()
             data = self.espgrid.get_tempo()
@@ -172,10 +167,7 @@ class TempoClock(object):
             self.bpm_start_beat = data[4]
             object.__setattr__(self, "bpm", self._convert_json_bpm(data[1]))
 
-        # self.schedule(self._espgrid_update_tempo)
         self.schedule(self._espgrid_update_tempo, int(self.now() + 1))
-
-        return
 
     def reset(self):
         """ Deprecated """
@@ -183,7 +175,6 @@ class TempoClock(object):
         self.beat = self.dtype(0)
         self.start_time = time.time()
         print("resetting clock")
-        return
 
     @classmethod
     def set_server(cls, server):
@@ -192,7 +183,6 @@ class TempoClock(object):
             see ServerManager.py for more. """
         assert isinstance(server, ServerManager)
         cls.server = server
-        return
 
     @classmethod
     def add_method(cls, func):
@@ -203,13 +193,11 @@ class TempoClock(object):
             a TempoClient instance from ServerManager.py """
         self.tempo_server = serv(self, **kwargs)
         self.tempo_server.start()
-        return
 
     def kill_tempo_server(self):
         """ Kills the tempo server """
         if self.tempo_server is not None:
             self.tempo_server.kill()
-        return
 
     def flag_wait_for_sync(self, value):
         self.waiting_for_sync = bool(value)
@@ -222,12 +210,10 @@ class TempoClock(object):
             self.flag_wait_for_sync(True)
         except ConnectionRefusedError as e:
             print(e)
-        pass
 
     def kill_tempo_client(self):
         if self.tempo_client is not None:
             self.tempo_client.kill()
-        return
 
     def __str__(self):
         return str(self.queue)
@@ -247,15 +233,16 @@ class TempoClock(object):
         self.last_now_call = self.bpm_start_time = time.time()
         self.bpm_start_beat = self.now()
         object.__setattr__(self, "bpm", self._convert_json_bpm(bpm))
-        # self.update_network_tempo(bpm, start_beat, start_time) -- updates at the bar...
-        return
 
     def set_tempo(self, bpm, override=False):
         """ Short-hand for update_tempo and update_tempo_now """
         return self.update_tempo_now(bpm) if override else self.update_tempo(bpm)
 
     def update_tempo(self, bpm):
-        """ Schedules the bpm change at the next bar, returns the beat and start time of the next change """
+        """
+        Schedules the bpm change at the next bar,
+        returns the beat and start time of the next change
+        """
         try:
             assert bpm > 0, "Tempo must be a positive number"
         except AssertionError as err:
@@ -315,7 +302,10 @@ class TempoClock(object):
         )
 
     def set_cpu_usage(self, value):
-        """ Sets the `sleep_time` attribute to values based on desired high/low/medium cpu usage """
+        """
+        Sets the `sleep_time` attribute to values based
+        on desired high/low/medium cpu usage
+        """
         assert 0 <= value <= 2
         self.sleep_time = self.sleep_values[value]
 
@@ -440,7 +430,7 @@ class TempoClock(object):
         return self._convert_bpm_json(self.bpm)
 
     def get_sync_info(self):
-        """ Returns information for synchronisation across multiple FoxDot instances. To be 
+        """ Returns information for synchronisation across multiple FoxDot instances. To be
             stored as a JSON object with a "sync" header """
 
         data = {
@@ -454,8 +444,12 @@ class TempoClock(object):
         return data
 
     def _now(self):
-        """ If the bpm is an int or float, use time since the last bpm change to calculate what the current beat is. 
-            If the bpm is a TimeVar, increase the beat counter by time since last call to _now()"""
+        """
+        If the bpm is an int or float, use time since the last
+        bpm change to calculate what the current beat is.
+        If the bpm is a TimeVar, increase the beat counter by
+        time since last call to _now()
+        """
         if isinstance(self.bpm, (int, float)):
             self.beat = (
                 self.bpm_start_beat + self.get_elapsed_beats_from_last_bpm_change()
@@ -593,7 +587,10 @@ class TempoClock(object):
         return Wrapper(self, obj, dur, args)
 
     def players(self, ex=[]):
-        return [p for p in self.playing if p not in exclude]
+        # TODO: The original line was this:
+        # return [p for p in self.playing if p not in exclude]
+        # What's exclude supposed to be?
+        return [p for p in self.playing]
 
     # Every n beats, do...
     def every(self, n, cmd, args=()):
@@ -626,9 +623,6 @@ class TempoClock(object):
         self.playing = []
         if self.espgrid is not None:
             self.schedule(self._espgrid_update_tempo)
-
-
-#####
 
 
 class Queue(object):

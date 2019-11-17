@@ -1,23 +1,20 @@
 """
 Time-Dependent Variables (TimeVar)
 
-TODO: using __call__ -> go through getattribute and check instead of already having a __call__
+TODO: using __call__ -> go through getattribute and check
+      instead of already having a __call__
 
 """
 import math
 
-from time import time
+from .Patterns import Operations as ops, asStream, PGroup, Pattern, PatternContainer
+from .Utils import get_inverse_op
 
-from .Patterns import *
-from .Utils import *
-from .Patterns.Operations import *
 from .Constants import inf
-
 
 
 def fetch(func):
     """ Function to wrap basic lambda operators for TimeVars  """
-
     def eval_now(a, b):
         if isinstance(a, TimeVar):
             a = a.now()
@@ -48,8 +45,8 @@ class TimeVar(object):
         self.get_seconds = bool(kwargs.get("seconds", False))
 
         # Dynamic method for calculating values
-        self.func = Nil
-        self.evaluate = fetch(Nil)
+        self.func = ops.Nil
+        self.evaluate = fetch(ops.Nil)
         self.dependency = None
 
         self.update(values, dur)
@@ -68,12 +65,14 @@ class TimeVar(object):
         self.proportion = 0
 
         # If the clock is not ticking, start it
-        if self.metro.ticking == False:
+        if self.metro.ticking is False:
             self.metro.start()
 
     def json_value(self):
-        """ Returns data about this TimeVar that can be sent over a network as JSON  """
-        ## pickle?
+        """
+        Returns data about this TimeVar that can be sent over a network as JSON
+        """
+        # pickle?
         return [str(self.__class__.__name__), list(self.values), list(self.dur)]
 
     @classmethod
@@ -256,8 +255,10 @@ class TimeVar(object):
     # Mathmetical operators
 
     def math_op(self, other, op):
-        """ Performs the mathematical operation between self and other. "op" should
-            be the string name of a dunder method  e.g. __mul__ """
+        """
+        Performs the mathematical operation between self and other. "op" should
+        be the string name of a dunder method  e.g. __mul__
+        """
         if not isinstance(other, (TimeVar, int, float)):
             if type(other) is tuple:
                 return PGroup([getattr(self, op).__call__(x) for x in other])
@@ -277,7 +278,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(Add)
+        new.evaluate = fetch(ops.Add)
         return new
 
     def __radd__(self, other):
@@ -285,7 +286,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(rAdd)
+        new.evaluate = fetch(ops.rAdd)
         return new
 
     def __sub__(self, other):
@@ -293,7 +294,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(rSub)
+        new.evaluate = fetch(ops.rSub)
         return new
 
     def __rsub__(self, other):
@@ -301,7 +302,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(Sub)
+        new.evaluate = fetch(ops.Sub)
         return new
 
     def __mul__(self, other):
@@ -309,7 +310,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(Mul)
+        new.evaluate = fetch(ops.Mul)
         return new
 
     def __rmul__(self, other):
@@ -317,7 +318,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(Mul)
+        new.evaluate = fetch(ops.Mul)
         return new
 
     def __pow__(self, other):
@@ -325,7 +326,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(rPow)
+        new.evaluate = fetch(ops.rPow)
         return new
 
     def __rpow__(self, other):
@@ -333,7 +334,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(Pow)
+        new.evaluate = fetch(ops.Pow)
         return new
 
     def __floordiv__(self, other):
@@ -341,7 +342,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(rFloorDiv)
+        new.evaluate = fetch(ops.rFloorDiv)
         return new
 
     def __rfloordiv__(self, other):
@@ -349,7 +350,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(FloorDiv)
+        new.evaluate = fetch(ops.FloorDiv)
         return new
 
     def __truediv__(self, other):
@@ -357,7 +358,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(rDiv)
+        new.evaluate = fetch(ops.rDiv)
         return new
 
     def __rtruediv__(self, other):
@@ -365,7 +366,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(Div)
+        new.evaluate = fetch(ops.Div)
         return new
 
     # Incremental operators (use in place of var = var + n)
@@ -405,7 +406,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(rMod)
+        new.evaluate = fetch(ops.rMod)
         return new
 
     def __rmod__(self, other):
@@ -413,7 +414,7 @@ class TimeVar(object):
         if not isinstance(other, (TimeVar, int, float)):
             return new
         new = self.new(other)
-        new.evaluate = fetch(Mod)
+        new.evaluate = fetch(ops.Mod)
         return new
 
     #  Comparisons -- todo: return TimeVar
@@ -429,7 +430,7 @@ class TimeVar(object):
     def __getitem__(self, other):
         new = self.new(other)
         new.dependency = self
-        new.evaluate = fetch(rGet)
+        new.evaluate = fetch(ops.rGet)
         return new
 
     def __iter__(self):
@@ -506,7 +507,7 @@ class Pvar(TimeVar):
     def __init__(self, values, dur=None, **kwargs):
         try:
             data = [asStream(val) for val in values]
-        except:
+        except Exception:
             data = [values]
 
         TimeVar.__init__(self, data, dur, **kwargs)
@@ -517,6 +518,7 @@ class Pvar(TimeVar):
         """
         pattern_attr = getattr(self.now(), attr)
         if callable(pattern_attr):
+
             def get_new_pvar(*args, **kwargs):
                 # If this is the root Pvar, change the values
                 if self.dependency is None:
@@ -530,6 +532,7 @@ class Pvar(TimeVar):
                     new_pvar = getattr(self.dependency, attr)(*args, **kwargs)
                     new_item = self.func(new_pvar, self.original_value)
                     return new_item
+
             return get_new_pvar
         else:
             return pattern_attr
@@ -567,7 +570,7 @@ class Pvar(TimeVar):
         """ Return a single timevar when using getitem """
         new = ChildTimeVar(other)
         new.dependency = self
-        new.evaluate = fetch(rGet)
+        new.evaluate = fetch(ops.rGet)
         return new
 
     def set_eval(self, func):
@@ -576,94 +579,94 @@ class Pvar(TimeVar):
 
     def __add__(self, other):
         new = self.new(other)
-        new.set_eval(rAdd)
+        new.set_eval(ops.rAdd)
         return new
 
     def __radd__(self, other):
         new = self.new((other))
-        new.set_eval(Add)
+        new.set_eval(ops.Add)
         return new
 
     def __sub__(self, other):
         new = self.new((other))
-        new.set_eval(rSub)
+        new.set_eval(ops.rSub)
         return new
 
     def __rsub__(self, other):
         new = self.new((other))
-        new.set_eval(Sub)
+        new.set_eval(ops.Sub)
         return new
 
     def __mul__(self, other):
         new = self.new((other))
-        new.set_eval(rMul)
+        new.set_eval(ops.rMul)
         return new
 
     def __rmul__(self, other):
         new = self.new((other))
-        new.set_eval(Mul)
+        new.set_eval(ops.Mul)
         return new
 
     def __div__(self, other):
         new = self.new((other))
-        new.set_eval(rDiv)
+        new.set_eval(ops.rDiv)
         return new
 
     def __rdiv__(self, other):
         new = self.new((other))
-        new.set_eval(Div)
+        new.set_eval(ops.Div)
         return new
 
     def __truediv__(self, other):
         new = self.new((other))
-        new.set_eval(rDiv)
+        new.set_eval(ops.rDiv)
         return new
 
     def __rtruediv__(self, other):
         new = self.new((other))
-        new.set_eval(Div)
+        new.set_eval(ops.Div)
         return new
 
     def __floordiv__(self, other):
         new = self.new((other))
-        new.set_eval(rFloorDiv)
+        new.set_eval(ops.rFloorDiv)
         return new
 
     def __rfloordiv__(self, other):
         new = self.new((other))
-        new.set_eval(FloorDiv)
+        new.set_eval(ops.FloorDiv)
         return new
 
     def __pow__(self, other):
         new = self.new((other))
-        new.set_eval(rPow)
+        new.set_eval(ops.rPow)
         return new
 
     def __rpow__(self, other):
         new = self.new((other))
-        new.set_eval(Pow)
+        new.set_eval(ops.Pow)
         return new
 
     def __mod__(self, other):
         new = self.new((other))
-        new.set_eval(rMod)
+        new.set_eval(ops.rMod)
         return new
 
     def __rmod__(self, other):
         new = self.new((other))
-        new.set_eval(Mod)
+        new.set_eval(ops.Mod)
         return new
 
     def __or__(self, other):
         # Used when piping patterns together
         new = self.new(PatternContainer(other))
-        new.set_eval(rOr)
+        new.set_eval(ops.rOr)
         return new
 
     def __ror__(self, other):
         # Used when piping patterns together
         new = self.new(PatternContainer(other))
-        new.set_eval(Or)
+        new.set_eval(ops.Or)
         return new
 
     def transform(self, func):
@@ -687,9 +690,9 @@ class PvarGenerator(Pvar):
     """
 
     def __init__(self, func, *args, **kwargs):
-        self.p_func = (
-            func
-        )  # p_func is the Pattern function e.g. PDur but self.func is created when operating on this PvarGenerator
+        # p_func is the Pattern function e.g. PDur but self.func is
+        # created when operating on this PvarGenerator
+        self.p_func = func
         self.args = []
         if "pattern" in kwargs:
             self.args.append(kwargs["pattern"])
@@ -698,7 +701,7 @@ class PvarGenerator(Pvar):
         )
         self.last_args = []
         self.last_data = []
-        self.evaluate = fetch(Nil)
+        self.evaluate = fetch(ops.Nil)
         self.dependency = None
 
     def info(self):
@@ -739,11 +742,13 @@ class PvarGenerator(Pvar):
                             return getattr(self.p_func(*old_args, **old_kwargs), attr)(
                                 *args, **kwargs
                             )
+
                         return PvarGenerator(new_func, *self.args)
                     else:
                         # Get the "parent" Pvar and re-apply the connecting function
                         new_pvar_gen = getattr(self.dependency, attr)(*args, **kwargs)
                         return self.func(new_pvar_gen, self.original_value)
+
                 return get_new_pvar_gen
         return object.__getattribute__(self, attr)
 
@@ -756,7 +761,7 @@ class PvarGeneratorEx(PvarGenerator):
         self.args = list(args)
         self.last_args = []
         self.last_data = []
-        self.evaluate = fetch(Nil)
+        self.evaluate = fetch(ops.Nil)
         self.dependency = 1
 
 
