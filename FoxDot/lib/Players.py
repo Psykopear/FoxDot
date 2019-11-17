@@ -131,7 +131,6 @@ from .Key import *
 from .Repeat import *
 from .Patterns import *
 
-from .Bang import Bang
 from .Buffers import Samples
 from .Code import WarningMsg, debug_stdout
 from .Effects import FxList
@@ -285,8 +284,6 @@ class Player(Repeatable):
         self.envelope = None
         self.line_number = None
         self.whitespace = None
-        self.do_bang = False
-        self.bang_kwargs = {}
 
         # Keeps track of which note to play etc
         self.event_index = 0
@@ -1241,7 +1238,6 @@ class Player(Repeatable):
     def send(self, timestamp=None, verbose=True, **kwargs):
         """ Goes through the  current event and compiles osc messages and sends to server via the tempo clock """
         timestamp = timestamp if timestamp is not None else self.queue_block.time
-        # self.do_bang = False
         for i in range(self.get_event_length(**kwargs)):
             self.send_osc_message(
                 self.event, i, timestamp=timestamp, verbose=verbose, **kwargs
@@ -1580,19 +1576,6 @@ class Player(Repeatable):
         for attr, val in self.attr.items():
             s += "\t{}\t:{}\n".format(attr, val)
         return s
-
-    def bang(self, **kwargs):
-        """
-        Triggered when sendNote is called. Responsible for any
-        action to be triggered by a note being played. Default action
-        is underline the player
-        """
-        if kwargs:
-            self.bang_kwargs = kwargs
-        elif self.bang_kwargs:
-            bang = Bang(self, self.bang_kwargs)
-        return self
-
 
 ###### GROUP OBJECT
 

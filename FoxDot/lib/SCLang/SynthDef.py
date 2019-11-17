@@ -66,7 +66,6 @@ class SynthDefBaseClass(object):
         self.rate = instance("rate")
         self.blur = instance("blur")
         self.beat_dur = instance("beat_dur")
-        self.cutoff = instance("cutoff")
 
         # Envelope
         self.atk = instance("atk")
@@ -89,7 +88,6 @@ class SynthDefBaseClass(object):
             "rel": 0.01,
             "peak": 1,
             "level": 0.8,
-            "cutoff": 1000,
         }
 
         # The amp is multiplied by this before being sent to SC
@@ -97,7 +95,6 @@ class SynthDefBaseClass(object):
 
         # Add to list
         self.container[self.name] = self
-
         self.add_base_class_behaviour()
 
     # Context Manager
@@ -110,25 +107,14 @@ class SynthDefBaseClass(object):
 
     # String representation
     # ---------------------
-
     def __str__(self):
-        Def = "SynthDef.new(\{},\n".format(self.name)
-        Def += "{}|{}|\n".format("{", format_args(kwargs=self.defaults, delim="="))
-        Def += "{}\n".format(self.get_base_class_variables())
-        Def += "{}\n".format(self.get_base_class_behaviour())
-        Def += "{}".format(self.get_custom_behaviour())
-        Def += "osc = Mix(osc) * 0.5;\n"
-        Def += "osc = Pan2.ar(osc, pan);\n"
-        Def += "\tReplaceOut.ar(bus, osc)"
-        Def += "}).add;\n"
-        return Def
+        return str(self.name)
 
     def __repr__(self):
         return str(self.name)
 
     # Combining with other SynthDefs
     # ------------------------------
-
     def __add__(self, other):
         if not isinstance(other, SynthDef):
             raise TypeError("Warning: '{}' is not a SynthDef".format(str(other)))
@@ -138,13 +124,11 @@ class SynthDefBaseClass(object):
 
     # Returning the SynthDefProxy
     # ---------------------------
-
     def __call__(self, degree=None, **kwargs):
         return SynthDefProxy(self.name, degree, kwargs)
 
     # Getter and setter
     # -----------------
-
     def __getattribute__(self, key):
         if key.startswith("_"):
             return object.__getattribute__(self, key)
@@ -174,7 +158,6 @@ class SynthDefBaseClass(object):
 
     # Defining class behaviour
     # ------------------------
-
     def add_base_class_behaviour(self):
         """ Defines the initial setup for every SynthDef """
         pass
