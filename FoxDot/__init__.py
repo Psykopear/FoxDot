@@ -17,14 +17,11 @@ Copyright Ryan Kirkbride 2015
 
 import atexit
 import datetime
-import getpass
 import os
 import platform
 import psutil
 import select
 import subprocess
-import sys
-import time
 
 
 def check_and_kill_sclang_linux():
@@ -64,7 +61,7 @@ def boot_supercollider():
 
         running = is_proc_running("sclang")
 
-        if running == False:
+        if running is False:
             subprocess.Popen([sclangloc, arg], cwd=ourcwd, shell=True)
 
     elif OS == "Linux":
@@ -80,7 +77,7 @@ def boot_supercollider():
         poll_obj.register(process.stdout, select.POLLIN)
         time_limit = datetime.datetime.now() + datetime.timedelta(seconds=5)
         while datetime.datetime.now() < time_limit:
-            poll_result = poll_obj.poll(0)
+            poll_obj.poll(0)
     else:
         print("Operating system unrecognised")
 

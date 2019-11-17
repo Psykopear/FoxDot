@@ -1,34 +1,33 @@
 import logging
 import os.path
 
+from importlib import reload
+
+from .Code import FoxDotCode, when, functions
+
+from .TempoClock import TempoClock
+from .Buffers import Samples
+from .Players import Player, EmptyPlayer, Group
+from .Patterns import PatternMethod, Get, Pattern, Sequences
+from .Key import PlayerKey
+from .Effects import FxList
+from .TimeVar import TimeVar, fetch, linvar, var
+from .Midi import MidiIn
+from .ServerManager import ServerManager, Server, TempoServer
+from .SCLang import SynthDefs
+
+from .Constants import inf
+from .SCLang._SynthDefs import init_synths
+
+globals()["inf"] = inf
+globals().update(init_synths())
+
 with open((os.path.join(os.path.dirname(__file__), ".version")), "r") as f:
     __version__ = f.read()
 
-from .Code import *
-
 FoxDotCode.namespace = globals()
 
-from .TempoClock import *
-from .Buffers import *
-from .Players import *
-from .Patterns import *
-from .Effects import *
-from .TimeVar import *
-from .Constants import *
-from .Midi import *
-from .Settings import *
-from .SCLang._SynthDefs import *
-from .ServerManager import *
-from .SCLang import SynthDefs, Env, SynthDef, CompiledSynthDef
-from .Root import Root
-from .Scale import Scale, Tuning
-
-# stdlib imports
-from random import choice as choose
-
 # Define any custom functions
-
-
 @PatternMethod
 def __getitem__(self, key):
     """ Overrides the Pattern.__getitem__ to allow indexing
@@ -179,7 +178,10 @@ def Ramp(t=32, ramp_time=4):
 
 
 def allow_connections(valid=True, *args, **kwargs):
-    """ Starts a new instance of ServerManager.TempoServer and connects it with the clock. Default port is 57999 """
+    """
+    Starts a new instance of ServerManager.TempoServer and
+    connects it with the clock. Default port is 57999
+    """
     if valid:
         Clock.start_tempo_server(TempoServer, **kwargs)
         print("Listening for connections on {}".format(Clock.tempo_server))
@@ -223,7 +225,7 @@ nextbar = var([0]).transform(lambda a: Clock.next_bar())
 
 Attributes = Player.get_attributes()
 PatternMethods = Pattern.get_methods()
-PatternTypes = functions(Patterns.Sequences)
+PatternTypes = functions(Sequences)
 
 # Start
 Clock.start()
