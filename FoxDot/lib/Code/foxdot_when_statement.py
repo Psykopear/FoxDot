@@ -85,17 +85,13 @@ class _whenStatement:
             run the appropriate response code """
         if self.expr():
             if not self.do_switch:
-
                 self.action()
-
                 self.toggle_live_functions(True)
                 self.do_switch = True
                 self.elsedo_switch = False
         else:
             if not self.elsedo_switch:
-
                 self.notaction()
-
                 self.toggle_live_functions(False)
                 self.do_switch = False
                 self.elsedo_switch = True
@@ -165,20 +161,12 @@ class _whenLibrary:
         """ Continual loop evaluating when_statements
         """
         while len(self.library) > 0:
-
             for name, expression in self.library.items():
-
-                if expression.remove_me == True:
-
+                if expression.remove_me is True:
                     del self.library[name]
-
                 else:
-
                     expression.evaluate()
-
             sleep(0.01)
-
-        return
 
     def __call__(self, name, **kwargs):
         """ Calling when() with no arguments will evaluate all expressions
@@ -187,25 +175,15 @@ class _whenLibrary:
             or update do  / elsedo
 
         """
-
         if name in self.library:
-
             return self.library[name]
-
         else:
-
             # Make a new statement
-
             self.library[name] = _whenStatement()
-
             # If that is the first statement, start the thread
-
             if len(self.library) == 1:
-
                 self.start_thread()
-
             # Return the last added expression
-
             return self.library[name]
 
     # what do these do?
