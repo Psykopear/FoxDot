@@ -20,7 +20,6 @@ Other than this, there are things I want to to that could be merged into the mai
 ## Ideas
 I think I will extract FoxDot as a standalone library, separated from both the GUI and the sclang code generation process (these two can be two projects on their own).
 
-
 ## Changes
 - Applied Black formatter to the codebase for easier reading. I avoided using it on `demos` since I don't think it's useful there.
 - Converted all the codebase to unix return characters (there was a mix of windows and unix return characters)

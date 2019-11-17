@@ -456,5 +456,4 @@ class Versus(Accompany):
 
 
 # Give pattern objects a reference to the PlayerKey type
-
 Pattern.PlayerKey = PlayerKey

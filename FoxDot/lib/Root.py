@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 from .Utils import modi
 from .TimeVar import TimeVar
 
@@ -8,10 +6,8 @@ CHROMATIC_NOTES = ["C", " ", "D", " ", "E", "F", " ", "G", " ", "A", " ", "B"]
 
 class Note:
     def __init__(self, index):
-
         self.char = None
         self.num = None
-
         self.set(index)
 
     def __str__(self):

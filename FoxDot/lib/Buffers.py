@@ -1,5 +1,4 @@
 """
-
 This module manages the allocation of buffer numbers and samples. To see
 a list of descriptions of what sounds are mapped to what characters,
 simply evaluate
@@ -127,8 +126,6 @@ DESCRIPTIONS = {
 }
 
 # Function-like class for searching directory for sample based on symbol
-
-
 class _symbolToDir:
     def __init__(self, root):
 
@@ -138,12 +135,10 @@ class _symbolToDir:
         """ Check if root is a valid directory then points FoxDot to that
             folder for searching for samples. Raises an OSError if 'root'
             is not a valid directory """
-
         if os.path.isdir(root):
             self.root = os.path.realpath(root)
         else:
             raise OSError("{!r} is not a valid directory".format(root))
-        return
 
     def __call__(self, symbol):
         """ Return the sample search directory for a symbol """
@@ -154,8 +149,6 @@ class _symbolToDir:
         elif symbol in nonalpha:
             longname = nonalpha[symbol]
             return join(self.root, "_", longname)
-        else:
-            return None
 
 
 symbolToDir = _symbolToDir(FOXDOT_SND)  # singleton
@@ -217,7 +210,6 @@ class BufferManager(object):
         self._fn_to_buf = {}
         for fn in files:
             self.loadBuffer(fn)
-        return
 
     def reset(self):
         return self._reset_buffers()
@@ -299,12 +291,9 @@ class BufferManager(object):
         elif force:
             buf = self._fn_to_buf[filename]
             self._server.bufferRead(filename, buf.bufnum)
-            # self._fn_to_buf[filename] = bufnum
-            # self._buffers[bufnum] = buf
         return self._fn_to_buf[filename]
 
     def reload(self, filename):
-        # symbol = self.getBufferFrom
         return self.loadBuffer(filename, force=True)
 
     def _getSoundFile(self, filename):
@@ -322,7 +311,6 @@ class BufferManager(object):
                     extpath = filename + "." + tryext
                     if isfile(extpath):
                         return extpath
-        return None
 
     def _getSoundFileOrDir(self, filename):
         """ Get a matching sound file or directory """
@@ -331,7 +319,6 @@ class BufferManager(object):
         foundfile = self._getSoundFile(filename)
         if foundfile:
             return abspath(foundfile)
-        return None
 
     def _searchPaths(self, filename):
         """ Search our search paths for an audio file or directory """
@@ -343,7 +330,6 @@ class BufferManager(object):
                 foundfile = self._getSoundFileOrDir(fullpath)
                 if foundfile:
                     return foundfile
-        return None
 
     def _getFileInDir(self, dirname, index):
         """ Return nth sample in a directory """
@@ -357,7 +343,6 @@ class BufferManager(object):
                 candidates.append(fullpath)
         if candidates:
             return candidates[int(index) % len(candidates)]
-        return None
 
     def _patternSearch(self, filename, index):
         """
@@ -414,7 +399,6 @@ class BufferManager(object):
                         candidates.append(fullpath)
         if candidates:
             return candidates[index % len(candidates)]
-        return None
 
     @Timing("bufferSearch", logargs=True)
     def _findSample(self, filename, index=0):
@@ -465,76 +449,3 @@ def hasext(filename):
 
 
 Samples = BufferManager()
-
-
-class LoopSynthDef(SampleSynthDef):
-    def __init__(self):
-        SampleSynthDef.__init__(self, "loop")
-        self.pos = self.new_attr_instance("pos")
-        self.sample = self.new_attr_instance("sample")
-        self.beat_stretch = self.new_attr_instance("beat_stretch")
-        self.defaults["pos"] = 0
-        self.defaults["sample"] = 0
-        self.defaults["beat_stretch"] = 0
-        self.base.append(
-            "rate = (rate * (1-(beat_stretch>0))) + ((BufDur.kr(buf) / sus) * (beat_stretch>0));"
-        )
-        self.base.append(
-            "osc = PlayBuf.ar(2, buf, BufRateScale.kr(buf) * rate, startPos: BufSampleRate.kr(buf) * pos, loop: 1.0);"
-        )
-        self.base.append(
-            "osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));"
-        )
-        self.osc = self.osc * self.amp
-        self.add()
-
-    def __call__(self, filename, pos=0, sample=0, **kwargs):
-        kwargs["buf"] = Samples.loadBuffer(filename, sample)
-        proxy = SampleSynthDef.__call__(self, pos, **kwargs)
-        proxy.kwargs["filename"] = filename
-        return proxy
-
-
-class StretchSynthDef(SampleSynthDef):
-    def __init__(self):
-        SampleSynthDef.__init__(self, "stretch")
-        self.base.append(
-            "osc = Warp1.ar(2, buf, Line.kr(0,1,sus), rate, windowSize: 0.2, overlaps: 4, interp:2);"
-        )
-        self.base.append(
-            "osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));"
-        )
-        self.osc = self.osc * self.amp
-        self.add()
-
-    def __call__(self, filename, pos=0, sample=0, **kwargs):
-        kwargs["buf"] = Samples.loadBuffer(filename, sample)
-        proxy = SampleSynthDef.__call__(self, pos, **kwargs)
-        proxy.kwargs["filename"] = filename
-        return proxy
-
-
-class GranularSynthDef(SampleSynthDef):
-    def __init__(self):
-        SampleSynthDef.__init__(self, "gsynth")
-        self.pos = self.new_attr_instance("pos")
-        self.sample = self.new_attr_instance("sample")
-        self.defaults["pos"] = 0
-        self.defaults["sample"] = 0
-        self.base.append(
-            "osc = PlayBuf.ar(2, buf, BufRateScale.kr(buf) * rate, startPos: BufSampleRate.kr(buf) * pos);"
-        )
-        self.base.append(
-            "osc = osc * EnvGen.ar(Env([0,1,1,0],[0.05, sus-0.05, 0.05]));"
-        )
-        self.osc = self.osc * self.amp
-        self.add()
-
-    def __call__(self, filename, pos=0, sample=0, **kwargs):
-        kwargs["buf"] = Samples.loadBuffer(filename, sample)
-        return SampleSynthDef.__call__(self, pos, **kwargs)
-
-
-loop = LoopSynthDef()
-stretch = StretchSynthDef()
-# gsynth = GranularSynthDef()

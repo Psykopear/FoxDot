@@ -1,12 +1,12 @@
-from __future__ import absolute_import, division, print_function
+import math
+
+from random import choice
+from copy import copy
 
 from .Patterns import Pattern, PGroup, asStream
 from .TimeVar import TimeVar
 from .Root import Root
 
-from random import choice
-from copy import copy
-import math
 
 
 def miditofreq(midinote):
@@ -470,9 +470,3 @@ class __scale__:
 
 
 Scale = __scale__()
-
-
-# class Chord:
-#     def __init__(self):
-#         self.scale = Scale.default
-#         self.root  = Root.default
