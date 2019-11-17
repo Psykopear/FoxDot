@@ -1,11 +1,9 @@
-from __future__ import absolute_import, division, print_function
-
-from ..Utils import *
+"""
+Module for key operations on Python lists or FoxDot Patterns
+"""
 import itertools
 
-"""
-    Module for key operations on Python lists or FoxDot Patterns
-"""
+from ..Utils import LCM
 
 
 def DominantPattern(*patterns):
@@ -42,7 +40,7 @@ class POperand:
             try:
                 try:
                     val = self.operate(next(gen_a), next(gen_b))
-                except TypeError as e:
+                except TypeError:
                     raise TypeError("Cannot operate on {!r} and {!r}".format(A, B))
             except ZeroDivisionError:
                 val = 0

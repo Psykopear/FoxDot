@@ -1,23 +1,21 @@
 import itertools
-from functools import partial
 
-from os.path import dirname
-from random import shuffle, choice
-from copy import copy, deepcopy
+from random import choice
+from copy import copy
 
 from .Key import *
 from .Repeat import *
 from .Patterns import *
 
 from .Buffers import Samples
-from .Code import WarningMsg, debug_stdout
+from .Code import WarningMsg
 from .Effects import FxList
 from .Root import Root
 from .SCLang.SynthDef import SynthDefProxy, SynthDef, SynthDefs
-from .Scale import Scale, ScaleType, ScalePattern, midi, miditofreq, get_freq_and_midi
+from .Scale import Scale, get_freq_and_midi
 from .Settings import SamplePlayer, LoopPlayer
-from .TimeVar import TimeVar, Pvar
-from .Utils import stdout
+from .TimeVar import TimeVar
+from .Utils import get_first_item
 
 
 class EmptyPlayer(object):

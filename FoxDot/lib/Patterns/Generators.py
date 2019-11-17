@@ -25,13 +25,9 @@
         P[10, 12, 12, 11, 10]
 
 """
-
-
-from __future__ import absolute_import, division, print_function
+import random
 
 from .Main import GeneratorPattern, Pattern, asStream
-
-import random
 
 
 class RandomGenerator(GeneratorPattern):
@@ -180,7 +176,7 @@ class PwRand(RandomGenerator):
 
 
 class PChain(RandomGenerator):
-    """ An example of a Markov Chain generator pattern. The mapping argument 
+    """ An example of a Markov Chain generator pattern. The mapping argument
         should be a dictionary of keys whose values are a list/pattern of possible
         destinations.  """
 
@@ -211,7 +207,7 @@ class PChain(RandomGenerator):
 
 class PZ12(GeneratorPattern):
     """ Implementation of the PZ12 algorithm for predetermined random numbers. Using
-        an irrational value for p, however, results in a non-determined order of values. 
+        an irrational value for p, however, results in a non-determined order of values.
         Experimental, only works with 2 values.
     """
 

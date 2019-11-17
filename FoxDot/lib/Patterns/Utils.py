@@ -1,4 +1,5 @@
-from .Sequences import *
+from .Main import Pattern, asStream
+from .Sequences import PDur, PGroup
 
 # Other useful functions that don't return a single pattern
 
@@ -30,11 +31,6 @@ def CalculateDelaysFromDur(durations):
     """ Used to calculate delays when the `dur` argument is given tuples.
         It replicates two events.
     """
-    # If it's a PvarGenerator, this needs more work
-    # if isinstance(durations, Pattern.PvarGenerator):
-    #    durs = durations.transform(lambda a, b: CalculateDelaysFromDur(b.now())[0])
-    #    dels = durations.transform(lambda a, b: CalculateDelaysFromDur(b.now())[1]) # could be more efficient?
-    #    return durs, dels
     # If its a Pvar, create a new Pvar that uses this function as its transformation function
     if isinstance(durations, Pattern.Pvar):
         durs = durations.transform(lambda a, b: CalculateDelaysFromDur(a)[0])

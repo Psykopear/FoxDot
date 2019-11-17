@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 from .Main import PGroup, PatternMethod, GeneratorPattern, sum_delays
 from ..Utils import modi, LCM
 
@@ -135,7 +133,7 @@ class PGroupMod(PGroupPlus):
 
 
 class PGroupOr(metaPGroupPrime):
-    """ Used to specify `sample` values, usually from within a play string using values 
+    """ Used to specify `sample` values, usually from within a play string using values
         between "bar" signs e.g. "|x2|" """
 
     bracket_style = "|()"
@@ -143,13 +141,9 @@ class PGroupOr(metaPGroupPrime):
 
     def __init__(self, seq=[]):
         metaPGroupPrime.__init__(self, seq)
-
         # May be changed to a Pattern
-
         if self.__class__ is not PGroupOr:
-
             return
-
         self.data = self.data[:1]  # Make sure we only have 1 element for data
 
     def calculate_sample(self):
@@ -175,15 +169,6 @@ class PGroupOr(metaPGroupPrime):
 
     def _get_step(self, dur):
         return dur
-
-
-# class PGroupFloorDiv(PGroupPrime):
-#    """ Unused """
-#    bracket_style="//()"
-
-# class PGroupSub(PGroupPrime):
-#    """ Unused """
-#    bracket_style="-()"
 
 
 class PGroupXor(metaPGroupPrime):
@@ -212,17 +197,6 @@ class PGroupXor(metaPGroupPrime):
     def _get_delay(self, delay):
         return delay
 
-
-# class PGroupAnd(PGroupPrime):
-#    """ Unused """
-#    bracket_style="&()"
-#    delay = 0
-#    def __init__(self, args):
-#        PGroupPrime.__init__(self, args[0])
-#        if len(args) > 0:
-#            self.delay = args[1]
-#    def calculate_step(self, i, dur):
-#        return i * self.delay
 
 # Define any pattern methods that use PGroupPrimes
 

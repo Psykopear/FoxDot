@@ -1,8 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
-import re
-from random import shuffle, choice
-
 re_nests = r"\((.*?)\)"
 re_square = r"\[.*?\]"
 re_curly = r"\{.*?\}"

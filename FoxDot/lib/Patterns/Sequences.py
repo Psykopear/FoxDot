@@ -8,15 +8,22 @@ All patterns inherit from Base.Pattern. There are two types of pattern:
 2. Generator types
     * Similar to generators but can be indexed (returns values based on functions)
 """
-
-from __future__ import absolute_import, division, print_function
-
 import random
 import math
 
-from .Main import *
-from .PGroups import *
-from .Operations import *
+from .Main import Pattern, PGroup, GeneratorPattern, asStream, loop_pattern_func
+from ..Utils import sliceToRange, LCM, modi, EuclidsAlgorithm, PulsesToDurations
+from .PGroups import (
+    PGroupStar,
+    PGroupPow,
+    PGroupOr,
+    PGroupPlus,
+    PGroupXor,
+    PGroupDiv,
+    PGroupMod,
+)
+
+# from .Operations import *
 from .Generators import PRand
 
 MAX_SIZE = 2048
@@ -96,9 +103,6 @@ class __pattern__(object):
         if isinstance(other, list):
             return Pattern().fromString(other[0], flat=True)
         return PGroupMod(other)
-
-    def __and__(self, other):
-        return PGroupAnd(other)
 
     def __invert__(self):
         return __reverse_pattern__()
@@ -182,7 +186,10 @@ def PZip2(pat1, pat2, rule=lambda a, b: True):
 
 @loop_pattern_func
 def PStutter(x, n=2):
-    """ PStutter(seq, n) -> Creates a pattern such that each item in the array is repeated n times (n can be a pattern) """
+    """
+    PStutter(seq, n) -> Creates a pattern such that each
+    item in the array is repeated n times (n can be a pattern)
+    """
     return Pattern([x for i in range(n)])
 
 
@@ -252,8 +259,10 @@ def PRange(start, stop=None, step=1):
 
 @loop_pattern_func
 def PTri(start, stop=None, step=1):
-    """ Returns a Pattern equivalent to ``Pattern(range(start, stop, step))`` with its reversed form
-    appended."""
+    """
+    Returns a Pattern equivalent to ``Pattern(range(start, stop, step))``
+    with its reversed form appended.
+    """
     if stop is None:
         start, stop = 0, start
     pat = PRange(start, stop, step)

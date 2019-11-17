@@ -1,14 +1,11 @@
 """
-Contains classes `Pattern` and `PGroup` and the base class for `GeneratorPattern` (see Generators.py).
+Contains classes `Pattern` and `PGroup` and the base
+class for `GeneratorPattern` (see Generators.py).
 """
-
-from __future__ import absolute_import, division, print_function
-
 from random import choice, shuffle
-from copy import deepcopy
 
-from .Operations import *
-from ..Utils import *
+from . import Operations as ops
+from ..Utils import LCM, modi, dots
 
 import functools
 import inspect
@@ -163,8 +160,10 @@ class metaPattern(object):
         return [attr for attr in dir(cls) if callable(getattr(cls, attr))]
 
     def get_data(self):
-        """ Returns self.data if data is not a single instance of this class, in which 
-            case self.data[0].data is returned """
+        """
+        Returns self.data if data is not a single instance of this class,
+        in which case self.data[0].data is returned
+        """
         return self.data
 
     @classmethod
@@ -352,82 +351,82 @@ class metaPattern(object):
     def __add__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__radd__(self)
-        return PAdd(self, other)
+        return ops.PAdd(self, other)
 
     def __radd__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__add__(self)
-        return PAdd(self, other)
+        return ops.PAdd(self, other)
 
     def __sub__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__rsub__(self)
-        return PSub(self, other)
+        return ops.PSub(self, other)
 
     def __rsub__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__sub__(self)
-        return PSub2(self, other)
+        return ops.PSub2(self, other)
 
     def __mul__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__rmul__(self)
-        return PMul(self, other)
+        return ops.PMul(self, other)
 
     def __rmul__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__mul__(self)
-        return PMul(self, other)
+        return ops.PMul(self, other)
 
     def __truediv__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__rtruediv__(self)
-        return PDiv(self, other)
+        return ops.PDiv(self, other)
 
     def __rtruediv__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__truediv__(self)
-        return PDiv2(self, other)
+        return ops.PDiv2(self, other)
 
     def __floordiv__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__rfloordiv__(self)
-        return PFloor(self, other)
+        return ops.PFloor(self, other)
 
     def __rfloordiv__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__floordiv__(self)
-        return PFloor2(self, other)
+        return ops.PFloor2(self, other)
 
     def __mod__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__rmod__(self)
-        return PMod(self, other)
+        return ops.PMod(self, other)
 
     def __rmod__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__mod__(self)
-        return PMod2(self, other)
+        return ops.PMod2(self, other)
 
     def __pow__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__rpow__(self)
-        return PPow(self, other)
+        return ops.PPow(self, other)
 
     def __rpow__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__pow__(self)
-        return PPow2(self, other)
+        return ops.PPow2(self, other)
 
     def __xor__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__rxor__(self)
-        return PPow(self, other)
+        return ops.PPow(self, other)
 
     def __rxor__(self, other):
         if isinstance(other, GeneratorPattern):
             return other.__xor__(self)
-        return PPow2(self, other)
+        return ops.PPow2(self, other)
 
     def __abs__(self):
         return self.new([abs(item) for item in self])
@@ -471,10 +470,10 @@ class metaPattern(object):
 
     #  Comparisons --> this might be a tricky one
     def __eq__(self, other):
-        return PEq(self, other)
+        return ops.PEq(self, other)
 
     def __ne__(self, other):
-        return PNe(self, other)
+        return ops.PNe(self, other)
 
     def eq(self, other):
         return self.new(
@@ -486,16 +485,7 @@ class metaPattern(object):
             [int(value != modi(asStream(other), i)) for i, value in enumerate(self)]
         )
 
-    # def gt(self, other):
-    #     return self.__class__([int(value > modi(asStream(other), i)) for i, value in enumerate(self)])
-    # def lt(self, other):
-    #     return self.__class__([int(value < modi(asStream(other), i)) for i, value in enumerate(self)])
-    # def ge(self, other):
-    #     return self.__class__([int(value >= modi(asStream(other), i)) for i, value in enumerate(self)])
-    # def le(self, other):
-    #     return self.__class__([int(value <= modi(asStream(other), i)) for i, value in enumerate(self)])
     def __gt__(self, other):
-        # return self.__class__([int(value > modi(asStream(other), i)) for i, value in enumerate(self)])
         values = []
         other = asStream(other)
         for i, value in enumerate(self):  # possibly LCM in future
@@ -506,7 +496,6 @@ class metaPattern(object):
         return self.new(values)
 
     def __ge__(self, other):
-        # return self.__class__([int(value >= modi(asStream(other), i)) for i, value in enumerate(self)])
         values = []
         other = asStream(other)
         for i, value in enumerate(self):  # possibly LCM in future
@@ -517,7 +506,6 @@ class metaPattern(object):
         return self.new(values)
 
     def __lt__(self, other):
-        # return self.__class__([int(value < modi(asStream(other), i)) for i, value in enumerate(self)])
         values = []
         other = asStream(other)
         for i, value in enumerate(self):  # possibly LCM in future
@@ -528,7 +516,6 @@ class metaPattern(object):
         return self.new(values)
 
     def __le__(self, other):
-        # return self.__class__([int(value <= modi(asStream(other), i)) for i, value in enumerate(self)])
         values = []
         other = asStream(other)
         for i, value in enumerate(self):  # possibly LCM in future
@@ -660,7 +647,7 @@ class metaPattern(object):
         for item in self.data:
             try:
                 new.append(item.invert())
-            except:
+            except Exception:
                 new.append((((item / lrg) * -1) + 1) * lrg)
         return self.new(new)
 
@@ -709,7 +696,10 @@ class metaPattern(object):
 
     @loop_pattern_method
     def trim(self, size):
-        """ Shortens a pattern until it's length is equal to size - cannot be greater than the length of the current pattern  """
+        """
+        Shortens a pattern until it's length is equal to size - cannot
+        be greater than the length of the current pattern
+        """
         new = []
         for n in range(min(len(self), size)):
             new.append(modi(self.data, n))
@@ -759,7 +749,7 @@ class metaPattern(object):
         new = []
         for pair in [
             list(val)
-            for val in [reversed(self[i : i + n]) for i in range(0, len(self), n)]
+            for val in [reversed(self[i: i + n]) for i in range(0, len(self), n)]
         ]:
             for item in pair:
                 new.append(item)
@@ -1096,10 +1086,10 @@ class PGroup(metaPattern):
         metaPattern.__init__(self, seq)
 
         # If the PGroup contains patterns, invert it to a Pattern of PGroups
-        l = [len(p) for p in self.data if isinstance(p, Pattern)]
-        if len(l) > 0:
+        lenghts = [len(p) for p in self.data if isinstance(p, Pattern)]
+        if len(lenghts) > 0:
             new_data = []
-            for key in range(LCM(*l)):
+            for key in range(LCM(*lenghts)):
                 new_data.append(
                     self.__class__(
                         [
@@ -1212,7 +1202,7 @@ class PGroup(metaPattern):
         """ Updates the sample value in the event dictionary """
         if isinstance(sample, PGroup):
             new_sample = sample.replace(None, 0)
-            old_sample = event["sample"] * (sample == None)
+            old_sample = event["sample"] * (sample is None)
             event["sample"] = new_sample + old_sample
         elif sample is not None:
             event["sample"] = sample
@@ -1368,7 +1358,7 @@ class GeneratorPattern:
             self.cache[index] = value
             return value
 
-    def new(self, other, func=Nil):
+    def new(self, other, func=ops.Nil):
         """ Creates a new `GeneratorPattern` that references
             this pattern but returns a modified value based on
             func. """
@@ -1403,40 +1393,40 @@ class GeneratorPattern:
 
     # Arithmetic operations create new GeneratorPatterns
     def __add__(self, other):
-        return self.new(other, Add)
+        return self.new(other, ops.Add)
 
     def __radd__(self, other):
-        return self.new(other, Add)
+        return self.new(other, ops.Add)
 
     def __sub__(self, other):
-        return self.new(other, Sub)
+        return self.new(other, ops.Sub)
 
     def __rsub__(self, other):
-        return self.new(other, rSub)
+        return self.new(other, ops.rSub)
 
     def __mul__(self, other):
-        return self.new(other, Mul)
+        return self.new(other, ops.Mul)
 
     def __rmul__(self, other):
-        return self.new(other, Mul)
+        return self.new(other, ops.Mul)
 
     def __div__(self, other):
-        return self.new(other, Div)
+        return self.new(other, ops.Div)
 
     def __truediv__(self, other):
-        return self.new(other, Div)
+        return self.new(other, ops.Div)
 
     def __rdiv__(self, other):
-        return self.new(other, rDiv)
+        return self.new(other, ops.rDiv)
 
     def __rtruediv__(self, other):
-        return self.new(other, rDiv)
+        return self.new(other, ops.rDiv)
 
     def __mod__(self, other):
-        return self.new(other, Mod)
+        return self.new(other, ops.Mod)
 
     def __rmod__(self, other):
-        return self.new(other, rMod)
+        return self.new(other, ops.rMod)
 
     # Container methods
     def __iter__(self):
@@ -1457,7 +1447,9 @@ class GeneratorPattern:
         return PGroup([self.__class__(*self.args, **self.kwargs) for i in range(n)])
 
     def transform(self, func):
-        """ Use func, which should take 1 argument, to transform the values in a generator pattern. Trivial example:
+        """
+        Use func, which should take 1 argument,
+        to transform the values in a generator pattern. Trivial example:
             myGenerator.transform(lambda x: 0 if x in (0,1,2) else 3)
         """
         return self.new(None, lambda a, b: func(a))
@@ -1498,7 +1490,8 @@ class EmptyItem(object):
         return "_"
 
 
-"""    Utility functions and data
+"""
+Utility functions and data
 """
 
 # Used to force any non-pattern data into a Pattern
@@ -1520,7 +1513,7 @@ def PatternFormat(data):
     return data
 
 
-Format = PatternFormat  ## TODO - Remove this
+Format = PatternFormat  # TODO - Remove this
 
 
 def convert_nested_data(data):
@@ -1593,16 +1586,6 @@ def group_modi(pgroup, index):
         return group_modi(pgroup[index % len(pgroup)], index // len(pgroup))
     except (TypeError, AttributeError, ZeroDivisionError):
         return pgroup
-
-
-def get_avg_if(item1, item2, func=lambda x: x != 0):
-    if isinstance(item1, PGroup):
-        result = item1.avg_if(item2, func)
-    elif isinstance(item2, PGroup):
-        result = item2.avg_if(item1, func)
-    else:
-        result = avg_if_func(item1, item2, func)
-    return result
 
 
 def sum_delays(a, b):

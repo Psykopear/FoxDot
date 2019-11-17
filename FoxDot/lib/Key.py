@@ -1,8 +1,14 @@
-from __future__ import absolute_import, division, print_function
+import random
 
-from .Patterns import *
-from .TimeVar import TimeVar
-from .Utils import recursive_any, get_inverse_op
+from .Patterns import (
+    Pattern,
+    PGroup,
+    metaPattern,
+    GeneratorPattern,
+    force_pattern_args,
+    equal_values,
+)
+from .Utils import get_inverse_op
 from functools import partial
 
 
@@ -24,6 +30,7 @@ def convert_pattern_args(func):
             other_op = get_inverse_op(func.__name__)
             return getattr(value, other_op).__call__(self)
         return func(self, value)
+
     return new_method
 
 
@@ -72,117 +79,95 @@ class NumberKey(object):
 
     @convert_pattern_args
     def __add__(self, other):
-        function = lambda value: value + other
-        return self.transform(function)
+        return self.transform(lambda value: value + other)
 
     @convert_pattern_args
     def __radd__(self, other):
-        function = lambda value: other + value
-        return self.transform(function)
+        return self.transform(lambda value: other + value)
 
     @convert_pattern_args
     def __sub__(self, other):
-        function = lambda value: value - other
-        return self.transform(function)
+        return self.transform(lambda value: value - other)
 
     @convert_pattern_args
     def __rsub__(self, other):
-        function = lambda value: other - value
-        return self.transform(function)
+        return self.transform(lambda value: other - value)
 
     @convert_pattern_args
     def __mul__(self, other):
-        function = lambda value: value * other
-        return self.transform(function)
+        return self.transform(lambda value: value * other)
 
     @convert_pattern_args
     def __rmul__(self, other):
-        function = lambda value: other * value
-        return self.transform(function)
+        return self.transform(lambda value: other * value)
 
     @convert_pattern_args
     def __truediv__(self, other):
-        function = lambda value: value / other
-        return self.transform(function)
+        return self.transform(lambda value: value / other)
 
     @convert_pattern_args
     def __rtruediv__(self, other):
-        function = lambda value: other / value
-        return self.transform(function)
+        return self.transform(lambda value: other / value)
 
     @convert_pattern_args
     def __floordiv__(self, other):
-        function = lambda value: value // other
-        return self.transform(function)
+        return self.transform(lambda value: value // other)
 
     @convert_pattern_args
     def __rfloordiv__(self, other):
-        function = lambda value: other // value
-        return self.transform(function)
+        return self.transform(lambda value: other // value)
 
     @convert_pattern_args
     def __mod__(self, other):
-        function = lambda value: value % other
-        return self.transform(function)
+        return self.transform(lambda value: value % other)
 
     @convert_pattern_args
     def __rmod__(self, other):
-        function = lambda value: other % value
-        return self.transform(function)
+        return self.transform(lambda value: other % value)
 
     @convert_pattern_args
     def __pow__(self, other):
         """ If operating with a pattern, return a pattern of values """
-        function = lambda value: value ** other
-        return self.transform(function)
+        return self.transform(lambda value: value ** other)
 
     @convert_pattern_args
     def __rpow__(self, other):
         """ If operating with a pattern, return a pattern of values """
-        function = lambda value: value ** other
-        return self.transform(function)
+        return self.transform(lambda value: value ** other)
 
     @convert_pattern_args
     def __xor__(self, other):
         """ If operating with a pattern, return a pattern of values """
-        function = lambda value: value ** other
-        return self.transform(function)
+        return self.transform(lambda value: value ** other)
 
     @convert_pattern_args
     def __rxor__(self, other):
         """ If operating with a pattern, return a pattern of values """
-        function = lambda value: other ** value
-        return self.transform(function)
+        return self.transform(lambda value: other ** value)
 
     @convert_pattern_args
     def __eq__(self, other):
-        function = lambda value: value == other
-        return self.transform(function)
+        return self.transform(lambda value: value == other)
 
     @convert_pattern_args
     def __ne__(self, other):
-        function = lambda value: (value != other)
-        return self.transform(function)
+        return self.transform(lambda value: (value != other))
 
     @convert_pattern_args
     def __gt__(self, other):
-        function = lambda value: (value > other)
-        return self.transform(function)
+        return self.transform(lambda value: (value > other))
 
     @convert_pattern_args
     def __ge__(self, other):
-        function = lambda value: (value >= other)
-        return self.transform(function)
+        return self.transform(lambda value: (value >= other))
 
     @convert_pattern_args
     def __lt__(self, other):
-        function = lambda value: (value < other)
-        return self.transform(function)
+        return self.transform(lambda value: (value < other))
 
     @convert_pattern_args
     def __le__(self, other):
-        function = lambda value: (value <= other)
-        return self.transform(function)
+        return self.transform(lambda value: (value <= other))
 
     def __abs__(self):
         return self.transform(abs)
@@ -392,8 +377,11 @@ class PlayerKey(NumberKey):
         return
 
     def update(self, value, time):
-        """ Updates the contents of the PlayerKey *if* the time value is different to self.last_updated.
-            If they are the same, the the contents become a PGroup of the two values """
+        """
+        Updates the contents of the PlayerKey *if* the time
+        value is different to self.last_updated.
+        If they are the same, the the contents become a PGroup of the two values
+        """
         if not equal_values(value, self.value):
             # if value != self.value:
             if time == self.last_updated:
