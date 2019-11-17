@@ -6,13 +6,8 @@ import time
 from traceback import format_exc as error_stack
 from types import CodeType, FunctionType
 
-try:
-    from types import TypeType
-except ImportError:
-    TypeType = type
-
 from ..Utils import modi
-from ..Settings import *
+from ..Settings import FOXDOT_STARTUP_PATH
 
 """
 Live Object
@@ -47,6 +42,7 @@ FoxCode
 =======
 Handles the execution of FoxDot code
 """
+
 
 class CodeString:
     def __init__(self, raw):
@@ -135,41 +131,11 @@ class FoxDotCode:
                 if verbose is True:
                     print(response)
             exec(self._compile(code), self.namespace)
-        except Exception as e:
+        except Exception:
             response = error_stack()
             if verbose_error is True:
                 print(response)
         return response
-
-    def update_line_numbers(self, text_widget, start="1.0", end="end", remove=0):
-
-        lines = text_widget.get(start, end).split("\n")[remove:]
-        update = []
-        offset = int(start.split(".")[0])
-
-        for i, line in enumerate(lines):
-            # Check line for a player and assign it a line number
-            match = re_player.match(line)
-            line_changed = False
-
-            if match is not None:
-                whitespace = len(match.group(1))
-                player = match.group(2)
-                line = i + offset
-
-                if player in self.player_line_numbers:
-                    if (line, whitespace) != self.player_line_numbers[player]:
-                        line_changed = True
-
-                if line_changed or player not in self.player_line_numbers:
-                    self.player_line_numbers[player] = (line, whitespace)
-                    update.append("{}.id = '{}'".format(player, player))
-                    update.append("{}.line_number = {}".format(player, line))
-                    update.append("{}.whitespace  = {}".format(player, whitespace))
-
-        # Execute updates if necessary
-        if len(update) > 0:
-            self.__call__("\n".join(update), verbose=False)
 
 
 execute = FoxDotCode()  # this is not well named
@@ -226,7 +192,7 @@ def WarningMsg(*text):
 # Should use insepct module
 def classes(module):
     """ Returns a list of class names defined in module """
-    return [name for name, data in vars(module).items() if type(data) == TypeType]
+    return [name for name, data in vars(module).items() if type(data) == type]
 
 
 def instances(module, cls):

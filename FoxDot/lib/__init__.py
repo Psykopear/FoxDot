@@ -1,26 +1,27 @@
 import logging
+import builtins
 import os.path
 
 from importlib import reload
 
-from .Code import FoxDotCode, when, functions
-
-from .TempoClock import TempoClock
 from .Buffers import Samples
-from .Players import Player, EmptyPlayer, Group
-from .Patterns import PatternMethod, Get, Pattern, Sequences
-from .Key import PlayerKey
-from .Effects import FxList
-from .TimeVar import TimeVar, fetch, linvar, var
-from .Midi import MidiIn
-from .ServerManager import ServerManager, Server, TempoServer
-from .SCLang import SynthDefs
-
+from .Code import FoxDotCode, when, functions
 from .Constants import inf
+from .Effects import FxList
+from .Key import PlayerKey
+from .Midi import MidiIn
+from .Patterns import PatternMethod, Get, Pattern, Sequences
+from .Players import Player, EmptyPlayer, Group
+from .SCLang import SynthDefs
 from .SCLang._SynthDefs import init_synths
+from .ServerManager import ServerManager, Server, TempoServer
+from .TempoClock import TempoClock
+from .TimeVar import TimeVar, fetch, linvar, var
 
-globals()["inf"] = inf
-globals().update(init_synths())
+# Add inf to builtins
+builtins.__dict__["inf"] = inf
+# Add synths to builtins
+builtins.__dict__.update(init_synths())
 
 with open((os.path.join(os.path.dirname(__file__), ".version")), "r") as f:
     __version__ = f.read()
