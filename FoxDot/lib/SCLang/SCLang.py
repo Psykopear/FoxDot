@@ -1,11 +1,6 @@
 """
-    SCLang.py
+SCLang.py
 """
-from ..Code import WarningMsg
-from ..Settings import SC3_PLUGINS
-
-from copy import copy
-import os
 
 
 def format_args(args=[], kwargs={}, delim=": "):

@@ -1,5 +1,8 @@
+from copy import copy
+
 from . import Env
-from .SCLang import *
+from .SCLang import instance
+from ..Code import WarningMsg
 from ..ServerManager import Server
 from ..Settings import SYNTHDEF_DIR
 
@@ -33,9 +36,9 @@ class SynthDict(dict):
 # Create container for SynthDefs
 SynthDefs = SynthDict()
 
+
 # SynthDef Base Class
 class SynthDefBaseClass(object):
-
     server = Server
     bus_name = "bus"
     var = ["osc", "env"]

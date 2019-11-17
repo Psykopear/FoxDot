@@ -3,10 +3,20 @@ import itertools
 from random import choice
 from copy import copy
 
-from .Key import *
-from .Repeat import *
-from .Patterns import *
-
+from .Key import PlayerKey, NumberKey
+from .Repeat import Repeatable
+from .Patterns import (
+    Pattern,
+    PwRand,
+    PGroup,
+    asStream,
+    modi,
+    PRand,
+    PGroupPrime,
+    pattern_depth,
+    GeneratorPattern,
+    group_modi,
+)
 from .Buffers import Samples
 from .Code import WarningMsg
 from .Effects import FxList
@@ -15,7 +25,7 @@ from .SCLang.SynthDef import SynthDefProxy, SynthDef, SynthDefs
 from .Scale import Scale, get_freq_and_midi
 from .Settings import SamplePlayer, LoopPlayer
 from .TimeVar import TimeVar
-from .Utils import get_first_item
+from .Utils import get_first_item, get_expanded_len
 
 
 class EmptyPlayer(object):
@@ -246,7 +256,10 @@ class Player(Repeatable):
     def test_for_circular_reference(
         self, value, attr, last_player=None, last_attr=None
     ):
-        """ Used to raise an exception if a player's attribute refers to itself e.g. `p1 >> pads(dur=p1.dur)` """
+        """
+        Used to raise an exception if a player's attribute
+        refers to itself e.g. `p1 >> pads(dur=p1.dur)`
+        """
         # We are setting self.attr to value, check if value depends on self.attr
         if isinstance(value, PGroup):
             for item in value:
@@ -337,7 +350,7 @@ class Player(Repeatable):
         return self is other
 
     def __ne__(self, other):
-        return not self is other
+        return self is not other
 
     # --- Startup methods
 
@@ -531,7 +544,8 @@ class Player(Repeatable):
         )
 
     def update(self, synthdef, degree, **kwargs):
-        """ Updates the attributes of the player. Called using the >> syntax.
+        """
+        Updates the attributes of the player. Called using the >> syntax.
         """
         # SynthDef name
         self.synthdef = synthdef
@@ -573,7 +587,8 @@ class Player(Repeatable):
 
         # If only duration is specified, set sustain to that value also
         if "dur" in kwargs:
-            # If we use tuples / PGroups in setting duration, use it to modify delay using the PDur algorithm
+            # If we use tuples / PGroups in setting duration,
+            # use it to modify delay using the PDur algorithm
             setattr(self, "dur", kwargs["dur"])
             if "sus" not in kwargs:
                 self.sus = self.attr["dur"]
@@ -595,7 +610,7 @@ class Player(Repeatable):
             if self.metro.now_flag:
                 start_point = self.metro.now()
                 after = False
-            elif kwargs.get("quantise", True) == False:
+            elif kwargs.get("quantise", True) is False:
                 start_point = self.metro.now()
             else:
                 start_point = self.metro.next_bar()
@@ -816,11 +831,14 @@ class Player(Repeatable):
 
     def map(self, other, mapping, otherattr="degree"):
         """ p1 >> pads().map(b1, {0: {oct=[4,5], dur=PDur(3,8), 2: oct})     """
+        # TODO: Here there is a reference to "values" but
+        #       I can't understand where it's supposed to be, commenting for now
+
         # Convert dict to {"oct": {4}}
         # key is the value of player key, attr is
-        for key, minimap in mapping.items():
-            for attr, value in minimap.items():
-                setattr(self, attr, mapvar(getattr(other, attr), values))
+        # for key, minimap in mapping.items():
+        #     for attr, value in minimap.items():
+        #         setattr(self, attr, mapvar(getattr(other, attr), values))
         return self
 
     # --- Misc. Standard Object methods
@@ -869,24 +887,21 @@ class Player(Repeatable):
         for attr, value in self.event.items():
             value = kwargs.get(attr, value)
             if isinstance(value, PGroup):
-                l = pattern_depth(value)
+                depth = pattern_depth(value)
             else:
-                l = 1
-            if l > num:
-                num = l
+                depth = 1
+            if depth > num:
+                num = depth
         return num
 
     def largest_attribute(self, **kwargs):
         """ Returns the length of the largest nested tuple in the current event dict """
-
         size = 1
-        values = []
-
         for attr, value in self.event.items():
             value = kwargs.get(attr, value)
-            l = get_expanded_len(value)
-            if l > size:
-                size = l
+            lenght = get_expanded_len(value)
+            if lenght > size:
+                size = lenght
         return size
 
     def get_event_length(self, event=None, **kwargs):
@@ -900,11 +915,11 @@ class Player(Repeatable):
         max_val = 0
         for attr, value in event.items():
             if isinstance(value, PGroup):
-                l = len(value)
+                length = len(value)
             else:
-                l = 1
-            if l > max_val:
-                max_val = l
+                length = 1
+            if length > max_val:
+                max_val = length
         return max_val
 
     def number_attr(self, attr):
@@ -926,8 +941,11 @@ class Player(Repeatable):
                 self.__dict__[key].update(value, time)
 
     def update_all_player_keys(self, ignore=[], event=None, **kwargs):
-        """ Updates the internal values of player keys that have been accessed e.g. p1.pitch. If there is a delay,
-            then schedule a function to update the values in the future. """
+        """
+        Updates the internal values of player keys that have
+        been accessed e.g. p1.pitch. If there is a delay,
+        then schedule a function to update the values in the future.
+        """
         # Don't bother if no keys are being accessed
         if len(self.accessed_keys) == 0:
             return
@@ -990,7 +1008,10 @@ class Player(Repeatable):
             )
 
     def update_player_key_relation(self, item):
-        """ Called during 'now' to update any Players that a player key is related to before using that value """
+        """
+        Called during 'now' to update any Players that a player
+        key is related to before using that value
+        """
         # If this *is* the parent, just get the current value
         if item.parent is self:
             self.update_player_key(item.attr, self.now(item.attr), 0)
@@ -1009,7 +1030,10 @@ class Player(Repeatable):
     # --- Methods for preparing and sending OSC messages to SuperCollider
 
     def unpack(self, item):
-        """ Converts a pgroup to floating point values and updates and time var or playerkey relations """
+        """
+        Converts a pgroup to floating point values and updates
+        and time var or playerkey relations
+        """
         if isinstance(item, GeneratorPattern):
             # "pop" value from the generator
             item = item.getitem()  # could be renamed to "next"
@@ -1112,7 +1136,10 @@ class Player(Repeatable):
         return self
 
     def send(self, timestamp=None, verbose=True, **kwargs):
-        """ Goes through the  current event and compiles osc messages and sends to server via the tempo clock """
+        """
+        Goes through the  current event and compiles osc
+        messages and sends to server via the tempo clock
+        """
         timestamp = timestamp if timestamp is not None else self.queue_block.time
         for i in range(self.get_event_length(**kwargs)):
             self.send_osc_message(
@@ -1120,7 +1147,10 @@ class Player(Repeatable):
             )
 
     def send_osc_message(self, event, index, timestamp=None, verbose=True, **kwargs):
-        """ Compiles and sends an individual OSC message created by recursively unpacking nested PGroups """
+        """
+        Compiles and sends an individual OSC message created
+        by recursively unpacking nested PGroups
+        """
         packet = {}
 
         event = event.copy()
@@ -1169,9 +1199,7 @@ class Player(Repeatable):
         ):
             # Need to send delay and synthdef separately
             delay = self.metro.beat_dur(message.get("delay", 0))
-            synthdef = self.get_synth_name(
-                message.get("buf", 0)
-            )  # to send to play
+            synthdef = self.get_synth_name(message.get("buf", 0))  # to send to play
             compiled_msg = self.metro.server.get_bundle(
                 synthdef, message, timestamp=timestamp + delay
             )
@@ -1453,9 +1481,8 @@ class Player(Repeatable):
             s += "\t{}\t:{}\n".format(attr, val)
         return s
 
-###### GROUP OBJECT
 
-
+# GROUP OBJECT
 class Group:
 
     metro = None
@@ -1512,7 +1539,10 @@ class Group:
         return self
 
     def __getattr__(self, name):
-        """ Returns a Pattern object containing the desired attribute for each player in the group  """
+        """
+        Returns a Pattern object containing the desired
+        attribute for each player in the group
+        """
         if name == "players":
             return self.__dict__["players"]
         attributes = GroupAttr()
@@ -1530,7 +1560,8 @@ class GroupAttr(list):
 
 
 class rest(object):
-    """ Represents a rest when used with a Player's `dur` keyword
+    """
+    Represents a rest when used with a Player's `dur` keyword
     """
 
     def __init__(self, dur=1):

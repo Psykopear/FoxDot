@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 from .SCLang import *
 from .SynthDef import (
     SynthDefs,
@@ -8,5 +6,4 @@ from .SynthDef import (
     SampleSynthDef,
     CompiledSynthDef,
 )
-
 from . import Env

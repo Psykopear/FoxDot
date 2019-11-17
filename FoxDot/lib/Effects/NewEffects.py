@@ -1,6 +1,6 @@
 import inspect
 
-from ..SCLang.SCLang import *
+from ..SCLang.SCLang import Vibrato, instance, cls, Formlet, RHPF
 
 # To be moved to SCLang later
 EnvGen = cls("EnvGen")

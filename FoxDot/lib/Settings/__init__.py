@@ -3,6 +3,9 @@ import sys
 
 from importlib import reload
 
+from . import conf
+
+
 # Check for OS -> mac, linux, win
 SYSTEM = 0
 WINDOWS = 0
@@ -78,7 +81,6 @@ def GET_TUTORIAL_FILES():
 
 
 # Set Environment Variables
-from . import conf
 
 reload(conf)  # incase of a reload
 

@@ -7,10 +7,9 @@ TODO: using __call__ -> go through getattribute and check
 """
 import math
 
+from .Constants import inf
 from .Patterns import Operations as ops, asStream, PGroup, Pattern, PatternContainer
 from .Utils import get_inverse_op
-
-from .Constants import inf
 
 
 def fetch(func):

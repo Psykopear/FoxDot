@@ -1,15 +1,10 @@
 """
-    compare_functions.py(funcA, funcB):
-
-        returns True if the functions are identical
-    
+compare_functions.py(funcA, funcB):
+    returns True if the functions are identical
 """
-
-from __future__ import absolute_import, division, print_function
 
 
 def func_cmp(funcA, funcB):
-
     codeA = funcA.__code__
     A_bytecode = codeA.co_code
     A_constants = codeA.co_consts

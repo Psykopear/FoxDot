@@ -1,9 +1,9 @@
+import inspect
+
 from .Code import WarningMsg
 from .Patterns import Pattern, Cycle, asStream
 from .Utils import modi
-from .TimeVar import var, Pvar
-
-import inspect
+from .TimeVar import var
 
 
 class MethodList:

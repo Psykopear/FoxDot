@@ -1,9 +1,4 @@
 """ Allows you continually update a function """
-
-from __future__ import absolute_import, division, print_function
-
-# TODO: dependencies
-
 _live_functions_dict = {}
 
 
@@ -31,7 +26,8 @@ def livefunction(f, dependency=None):
     """ Wraps a function 'f' in a flexible/interactive way """
     # Live functions can "depend" on others for switching from live or not
     if dependency in _live_functions_dict:
-        dependenct = _live_functions_dict[dependency.__name__]
+        # dependenct
+        _live_functions_dict[dependency.__name__]
     # Add / update a dictionary of all live functions
     if f.__name__ not in _live_functions_dict:
         _live_functions_dict[f.__name__] = _live_function(f, dependency)

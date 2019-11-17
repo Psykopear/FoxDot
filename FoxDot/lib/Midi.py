@@ -1,4 +1,6 @@
-""" Module for converting handling MIDI in/out and functions relating to MIDI pitch calculation. """
+"""
+Module for converting handling MIDI in/out and functions relating to MIDI pitch calculation.
+"""
 try:
     import rtmidi
     from rtmidi import midiconstants
@@ -7,19 +9,13 @@ try:
     SONG_POSITION_POINTER = midiconstants.SONG_POSITION_POINTER
     SONG_START = midiconstants.SONG_START
     SONG_STOP = midiconstants.SONG_STOP
-except ImportError as _err:
+except ImportError:
     pass
 
-from .Patterns import asStream
-from .Scale import ScalePattern
-from .TimeVar import TimeVar
 from .SCLang import SynthDefProxy
-
-import time
 
 
 class MidiInputHandler(object):
-
     """Midi Handler CallBack Function"""
 
     def __init__(self, midi_ctrl):
@@ -34,7 +30,6 @@ class MidiInputHandler(object):
         if TIMING_CLOCK in datatype and not self.played:
             self.midi_ctrl.pulse += 1
             if self.midi_ctrl.pulse == self.midi_ctrl.ppqn:
-                t_master = 60.0
                 self.midi_ctrl.bpm = round(60.0 / self.midi_ctrl.delta, 0)
                 self.midi_ctrl.pulse = 0
                 self.midi_ctrl.delta = 0.0
@@ -49,7 +44,7 @@ class MidiIn:
             from a midi device """
         try:
             self.device = rtmidi.MidiIn()
-        except NameError:
+        except NameError as _err:
             raise ImportError(_err)
 
         self.available_ports = self.device.get_ports()

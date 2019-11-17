@@ -43,9 +43,7 @@
 
 """
 
-from __future__ import absolute_import, division, print_function
-
-from .foxdot_func_cmp import *
+from .foxdot_func_cmp import func_str
 from threading import Thread
 from time import sleep
 

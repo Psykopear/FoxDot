@@ -20,7 +20,6 @@ from os.path import abspath, join, isabs, isfile, isdir, splitext
 
 from .Code import WarningMsg
 from .Logging import Timing
-from .SCLang import SampleSynthDef
 from .ServerManager import Server
 from .Settings import FOXDOT_SND, FOXDOT_LOOP
 
