@@ -1,14 +1,10 @@
-from __future__ import absolute_import, division, print_function
-
-import os
 from . import Env
 from .SCLang import *
 from ..ServerManager import Server
 from ..Settings import SYNTHDEF_DIR
 
+
 # Container for SynthDefs
-
-
 class SynthDict(dict):
     module = None
     server = None
@@ -28,21 +24,16 @@ class SynthDict(dict):
     def reload(self):
         for key, item in self.items():
             item.load()
-        return
 
     def set_server(self, serv):
         self.server = serv
         self.server.synthdefs = self
-        return
 
 
 # Create container for SynthDefs
-
 SynthDefs = SynthDict()
 
 # SynthDef Base Class
-
-
 class SynthDefBaseClass(object):
 
     server = Server
@@ -75,6 +66,7 @@ class SynthDefBaseClass(object):
         self.rate = instance("rate")
         self.blur = instance("blur")
         self.beat_dur = instance("beat_dur")
+        self.cutoff = instance("cutoff")
 
         # Envelope
         self.atk = instance("atk")
@@ -97,6 +89,7 @@ class SynthDefBaseClass(object):
             "rel": 0.01,
             "peak": 1,
             "level": 0.8,
+            "cutoff": 1000,
         }
 
         # The amp is multiplied by this before being sent to SC
@@ -109,7 +102,6 @@ class SynthDefBaseClass(object):
 
     # Context Manager
     # ---------------
-
     def __enter__(self):
         return self
 
@@ -185,7 +177,7 @@ class SynthDefBaseClass(object):
 
     def add_base_class_behaviour(self):
         """ Defines the initial setup for every SynthDef """
-        return
+        pass
 
     def get_base_class_behaviour(self):
         return "\n".join(self.base)
@@ -214,29 +206,11 @@ class SynthDefBaseClass(object):
         """ Define the envelope """
         self.defaults.update(**kwargs)
         self.env = Env.adsr()
-        return
 
     # Adding the SynthDef to the Server
     # ---------------------------------
     def write(self):
         """  Doesn't write the SynthDef to file """
-        # # 1. See if the file exists
-
-        # if os.path.isfile(self.filename):
-        #     with open(self.filename) as f:
-        #         contents = f.read()
-        # else:
-        #     contents = ""
-
-        # # 2. If it does, check contents
-        # this_string = self.__str__()
-        # if contents != this_string:
-        #     try:
-        #         with open(self.filename, "w") as f:
-        #             f.write(this_string)
-        #     except IOError:
-        #         # print("Warning: Unable to update '{}' SynthDef.".format(self.name))
-        #         pass  # TODO - add python -m --verbose to print warnings?
         pass
 
     def has_envelope(self):
@@ -291,14 +265,12 @@ class SynthDefBaseClass(object):
 class SynthDef(SynthDefBaseClass):
     def __init__(self, *args, **kwargs):
         SynthDefBaseClass.__init__(self, *args, **kwargs)
-        # add vib depth?
 
     def add_base_class_behaviour(self):
         """ Defines the initial setup for every SynthDef """
         SynthDefBaseClass.add_base_class_behaviour(self)
         self.base.append("freq = In.kr(bus, 1);")
         self.base.append("freq = [freq, freq+fmod];")
-        return
 
 
 class SampleSynthDef(SynthDefBaseClass):
@@ -322,14 +294,6 @@ class FileSynthDef(SynthDefBaseClass):
         return open(self.filename, "rb").read()
 
 
-"""
-    SynthDefProxy Class
-    -------------------
-
-
-"""
-
-
 class SynthDefProxy:
     def __init__(self, name, degree, kwargs):
         self.name = name
@@ -351,11 +315,9 @@ class SynthDefProxy:
 
     def __getattr__(self, name):
         if name not in self.vars:
-
             def func(*args, **kwargs):
                 self.methods.append((name, (args, kwargs)))
                 return self
-
             return func
         else:
             return getattr(self, name)

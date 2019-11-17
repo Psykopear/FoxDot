@@ -3,7 +3,7 @@ SynthDef.new(\brass, {
     var osc, env;
     freq = In.kr(bus, 1);
     freq = freq + fmod;
-    rate=Lag.ar(freq, rate);
+    rate=Lag.kr(freq, rate);
     osc=(Saw.ar(rate, 0.4) + Saw.ar((rate + LFNoise2.ar(1).range(0.5, 1.1)), 0.4));
     osc=(osc + Resonz.ar(osc, (freq * XLine.ar(1, 5, 0.13)), 1));
     osc=BPF.ar(osc, (freq * 2.5), 0.3);
@@ -14,3 +14,5 @@ SynthDef.new(\brass, {
     osc = Pan2.ar(osc, pan);
     ReplaceOut.ar(bus, osc)
 }).add;
+
+FoxDot.start

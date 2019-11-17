@@ -20,12 +20,10 @@ def convert_pattern_args(func):
     def new_method(self, value):
         if isinstance(value, (list, tuple)):
             value = convert_to_pattern(value)
-        # if isinstance(value, (metaPattern, GeneratorPattern)):
         if isinstance(value, (Pattern, GeneratorPattern)):
             other_op = get_inverse_op(func.__name__)
             return getattr(value, other_op).__call__(self)
         return func(self, value)
-
     return new_method
 
 
@@ -34,7 +32,7 @@ class NumberKey(object):
         value. These are used when returing Player object attribute values accessed via
         `getattr` e.g. `p1.dur` or `getattr(p1, "dur")`. The parent attribute is the Player
         that contains the key or the referenced key in the case that the value has been
-        maniupulated. e.g. if `p1` is using `p2.degree` then `p1.degree.parent == p1` and 
+        maniupulated. e.g. if `p1` is using `p2.degree` then `p1.degree.parent == p1` and
         `p1.degree.value.parent == p2`.
     """
 
@@ -42,12 +40,6 @@ class NumberKey(object):
         # the number to store/update
         self.value = value
         self.calculate = function if function is not None else lambda x: x
-        # reference to another number key that this is linked to
-        # self.other = reference
-        # self.parent = self.value if isinstance(self.value, NumberKey) else None
-        # This is the Player object whose attribute this is fetching / chained to
-        # self.parent = self.other.parent if isinstance(self.other, NumberKey) else None
-        # self.
 
     def parent(self):
         return self.value if isinstance(self.value, NumberKey) else None
@@ -331,12 +323,9 @@ class NumberKey(object):
         """ p1 >> pads([0, 1, 2, 3])
             p2 >> pluck([4, 5, 0]).versus(p1, rule)
         """
-
         # 1. Sets this source player key amplify to be "off" when the rule is satisfied
-
         # 2. Returns a new PlayKey
-
-        return
+        pass
 
     # Values
 
@@ -368,39 +357,24 @@ class NumberKey(object):
         except TypeError:
             yield self.now()
 
-    # def child(self, other):
-    #     return NumberKey(self.value, other)
-
     def spawn_child(self, function):
         return self.__class__(self, function)
 
     def now(self, other=None):
         """ Returns the current value in the Key by calling the parent """
-
         value = self.value.now() if hasattr(self.value, "now") else self.value
-
         return self.calculate(value)
 
 
 class PlayerKey(NumberKey):
-    # def __init__(self, value=None, reference=None, parent=None, attr=None):
     def __init__(self, value, function=None, player=None, attr=None):
-
         NumberKey.__init__(self, value, function)
-
         if player is None and isinstance(self.value, PlayerKey):
-
             self.attr = self.value.attr
             self.player = self.value.player
-
         else:
-
             self.attr = attr
             self.player = player
-
-        # self.pattern = asStream(self.parent.attr[self.key]) if self.parent is not None else asStream([]) #
-        # self.pattern = NumberKey().transform(lambda x: self.player.attr[self.attr])
-
         self.last_updated = 0
 
     def cmp(self, player, attr):
@@ -434,10 +408,6 @@ class PlayerKey(NumberKey):
 
     # Could be removed
     def update_pattern(self):
-        # try:
-        #     self.pattern[:] = asStream(self.parent.attr[self.key])
-        # except TypeError:
-        #     self.pattern = asStream(self.parent.attr[self.key])
         return
 
 
@@ -448,8 +418,6 @@ class Accompany:
     keys_last_value = None
 
     def __init__(self, rel=[0, 2, 4]):
-
-        # self.frequency  = freq
         self.scale_size = 7
         self.relations = list(rel)
 
@@ -462,33 +430,20 @@ class Accompany:
         return self.this_last_value
 
     def find_new_value(self, playerkey):
-
         # Which value is the closest to this_last_value
-
         values = [(playerkey + x) % 7 for x in self.relations] + [
             (playerkey % 7) + (x - self.scale_size) for x in self.relations
         ]
-
         nearby = [abs(self.this_last_value - value) for value in values]
-
         indices = [nearby.index(val) for val in sorted(nearby)]
-
         r = random.random()
-
         if r <= 0.65:
-
             i = 0
-
         elif r <= 0.9:
-
             i = 1
-
         else:
-
             i = 2
-
         index = indices[i % len(indices)]
-
         return values[index]
 
 
@@ -497,7 +452,7 @@ class Versus(Accompany):
         pass
 
     def find_new_value(self, playerkey):
-        return
+        pass
 
 
 # Give pattern objects a reference to the PlayerKey type

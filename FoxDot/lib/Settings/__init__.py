@@ -1,25 +1,9 @@
-from __future__ import absolute_import, division, print_function
-
 import os
 import sys
 
-# Anything that needs to be updated
-
-PY_VERSION = sys.version_info[0]
-
-# Any Py2to3
-
-if PY_VERSION == 2:
-
-    range = xrange
-    input = raw_input
-
-else:
-
-    from importlib import reload
+from importlib import reload
 
 # Check for OS -> mac, linux, win
-
 SYSTEM = 0
 WINDOWS = 0
 LINUX = 1
@@ -65,7 +49,6 @@ FOXDOT_RECORD_FILE = os.path.realpath(FOXDOT_ROOT + "/osc/Record.scd")
 FOXDOT_TEMP_FILE = os.path.realpath(FOXDOT_ROOT + "/lib/Workspace/tmp/tempfile.txt")
 
 # If the tempfile doesn't exist, create it
-
 if not os.path.isfile(FOXDOT_TEMP_FILE):
     try:
         with open(FOXDOT_TEMP_FILE, "w") as f:
@@ -94,7 +77,6 @@ def GET_TUTORIAL_FILES():
 
 
 # Set Environment Variables
-
 from . import conf
 
 reload(conf)  # incase of a reload
@@ -122,21 +104,17 @@ FORWARD_ADDRESS = conf.FORWARD_ADDRESS
 FORWARD_PORT = conf.FORWARD_PORT
 
 if conf.SAMPLES_DIR is not None and conf.SAMPLES_DIR != "":
-
     FOXDOT_SND = os.path.realpath(conf.SAMPLES_DIR)
 
 
 def get_timestamp():
     import time
-
     return time.strftime("%Y%m%d-%H%M%S")
 
 
 # Name of SamplePlayer and LoopPlayer SynthDef
-
-
 class _SamplePlayer:
-    names = ("play1", "play2")
+    names = ("play", )
 
     def __eq__(self, other):
         return other in self.names
@@ -169,24 +147,5 @@ SamplePlayer = _SamplePlayer()
 LoopPlayer = _LoopPlayer()
 MidiPlayer = _MidiPlayer()
 
-
 # OSC Information
-
 OSC_MIDI_ADDRESS = "/foxdot_midi"
-
-# Colours
-
-
-class COLOURS:
-    plaintext = conf.plaintext
-    background = conf.background
-    functions = conf.functions
-    key_types = conf.key_types
-    user_defn = conf.user_defn
-    other_kws = conf.other_kws
-    comments = conf.comments
-    numbers = conf.numbers
-    strings = conf.strings
-    dollar = conf.dollar
-    arrow = conf.arrow
-    players = conf.players

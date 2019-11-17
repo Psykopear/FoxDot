@@ -1,4 +1,4 @@
-"""    
+"""
     Players are what make FoxDot make music. They are similar in design to
     SuperCollider's `PDef` and `PBind` combo but with slicker syntax. FoxDot
     uses SuperCollider to *actually* make the sound and does so by triggering
@@ -41,7 +41,7 @@
     Play multiple pitches together by putting them in round brackets: ::
 
         p1 >> pads([0,2,4,(0,2,4)])
-    
+
     When you start FoxDot up, your clock is ticking at 120bpm and your player
     objects are all playing in the major scale. With 8 pitches in the major scale,
     the 0 refers to the first pitch and the 7 refers to the pitch one octave
@@ -88,7 +88,7 @@
 
     To play multiple patterns simultaneously, you can create a new `play` object. This
     is useful if you want to have different attributes for each player. ::
-        
+
         bd >> play("x( x)  ", dur=1)
         hh >> play("---[--]", dur=[1/2,1/2,1/4], rate=4)
         sn >> play("  o ", rate=(.9,1), pan=(-1,1))
@@ -118,8 +118,6 @@
     delay - A duration of time to wait before sending the information to SuperCollider (defaults to 0)
 
     sample - Special keyword for Sample Players; selects another audio file from the bank of samples for a sample character.
-    
-
 """
 
 import itertools
@@ -129,26 +127,20 @@ from os.path import dirname
 from random import shuffle, choice
 from copy import copy, deepcopy
 
-from .Settings import SamplePlayer, LoopPlayer
-from .Code import WarningMsg, debug_stdout
-from .SCLang.SynthDef import SynthDefProxy, SynthDef, SynthDefs
-from .Effects import FxList
-from .Utils import stdout
-from .Buffers import Samples
-
 from .Key import *
 from .Repeat import *
 from .Patterns import *
 
-# from .Midi import *
-
-from .Root import Root
-from .Scale import Scale, ScaleType, ScalePattern
-from .Scale import midi, miditofreq, get_freq_and_midi
-
 from .Bang import Bang
-
+from .Buffers import Samples
+from .Code import WarningMsg, debug_stdout
+from .Effects import FxList
+from .Root import Root
+from .SCLang.SynthDef import SynthDefProxy, SynthDef, SynthDefs
+from .Scale import Scale, ScaleType, ScalePattern, midi, miditofreq, get_freq_and_midi
+from .Settings import SamplePlayer, LoopPlayer
 from .TimeVar import TimeVar, Pvar
+from .Utils import stdout
 
 
 class EmptyPlayer(object):
@@ -191,9 +183,9 @@ class Player(Repeatable):
     """
     FoxDot generates music by creating instances of `Player` and giving them instructions
     to follow. At startup FoxDot creates many instances of `Player` and assigns them to
-    any valid two character variable. This is so that when you start playing you don't 
+    any valid two character variable. This is so that when you start playing you don't
     have to worry about typing `myPlayer = Player()` and `myPlayer_2 = Player()` every
-    time you want to do something new. Of course there is nothing stopping you from 
+    time you want to do something new. Of course there is nothing stopping you from
     doing that if yo so wish.
 
     Instances of `Player` are given instructions to generate music using the `>>` syntax,
@@ -203,7 +195,7 @@ class Player(Repeatable):
     see more information about these in the `SCLang` module. Below describes how to assign
     a `SynthDefProxy` of the `SynthDef` `pads` to a `Player` instance called `p1`: ::
 
-        # Calling pads as if it were a function returns a 
+        # Calling pads as if it were a function returns a
         # pads SynthDefProxy object which is assigned to p1
         p1 >> pads()
 
@@ -900,7 +892,7 @@ class Player(Repeatable):
 
     def alt_dur(self, dur):
         """ Used to set a duration that changes linearly over time. You should use a `linvar` but
-            any value can be used. This sets the `dur` to 1 and uses the `bpm` attribute to 
+            any value can be used. This sets the `dur` to 1 and uses the `bpm` attribute to
             seemingly alter the durations """
 
         self.dur = 1
@@ -1289,7 +1281,7 @@ class Player(Repeatable):
         self.push_osc_to_server(packet, timestamp, verbose, **kwargs)
 
     def push_osc_to_server(self, packet, timestamp, verbose=True, **kwargs):
-        """ Adds message head, calculating frequency then sends to server if verbose is True and 
+        """ Adds message head, calculating frequency then sends to server if verbose is True and
             amp/bufnum values meet criteria """
         # Do any calculations e.g. frequency
         message = self.new_message_header(packet, **kwargs)
@@ -1307,7 +1299,7 @@ class Player(Repeatable):
             delay = self.metro.beat_dur(message.get("delay", 0))
             synthdef = self.get_synth_name(
                 message.get("buf", 0)
-            )  # to send to play1 or play2
+            )  # to send to play
             compiled_msg = self.metro.server.get_bundle(
                 synthdef, message, timestamp=timestamp + delay
             )
@@ -1388,23 +1380,13 @@ class Player(Repeatable):
         return event
 
     def set_queue_block(self, queue_block):
-        """ Gives this player object a reference to the other items that are 
+        """ Gives this player object a reference to the other items that are
             scheduled at the same time """
         self.queue_block = queue_block
 
     def get_synth_name(self, buf=0):
-        """ Returns the real SynthDef name of the player. Useful only for "play" 
-            as there is a play1 and play2 SynthDef for playing audio files with
-            one or two channels respectively. """
-        if self.synthdef == SamplePlayer:
-            numChannels = self.samples.getBuffer(buf).channels
-            if numChannels == 1:
-                synthdef = "play1"
-            else:
-                synthdef = "play2"
-        else:
-            synthdef = str(self.synthdef)
-        return synthdef
+        """ Returns the real SynthDef name of the player."""
+        return str(self.synthdef)
 
     def addfx(self, **kwargs):
         """ Not implemented - add an effect to the SynthDef bus on SuperCollider
@@ -1412,7 +1394,6 @@ class Player(Repeatable):
         return self
 
     #: Methods for stop/starting players
-
     def kill(self):
         """ Removes this object from the Clock and resets itself"""
         self.isplaying = False
