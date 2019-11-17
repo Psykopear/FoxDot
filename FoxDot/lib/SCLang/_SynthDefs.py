@@ -11,6 +11,8 @@ from .SCLang import instance
 
 CUSTOM_ARGS = {
     "evilbass": {"cutoff": 1000},
+    "brass": {"cutoff": 2000},
+    "arpy": {"fmod": 5},
 }
 
 for file in os.listdir(os.path.join(FOXDOT_ROOT, "osc/scsyndef/")):
