@@ -16,16 +16,12 @@ class _Effect:
     def __call__(self, order=0):
         def decorator(effect):
             effect_data = inspect.getargspec(effect)  # Original args and defaults
-
             # Get filename from function name
             filename = "{}.scd".format(effect.__name__)  # filename
-
             # Supplies arg names
             effect(*map(instance, effect_data.args))
-
             # Default values for arguments, to store
             defaults = dict(zip(effect_data.args, effect_data.defaults))
-
         return decorator
 
     def In(self):

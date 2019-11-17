@@ -20,13 +20,11 @@ Live Object
 
 Base for any self-scheduling objects
 """
-
 # Player RegEx
 re_player = re.compile(r"(\s*?)(\w+)\s*?>>\s*?\w+")
 
 
 class LiveObject(object):
-
     foxdot_object = True
     isAlive = True
 
@@ -45,12 +43,10 @@ class LiveObject(object):
 
 
 """
-    FoxCode
-    =======
-    Handles the execution of FoxDot code
-
+FoxCode
+=======
+Handles the execution of FoxDot code
 """
-
 
 class CodeString:
     def __init__(self, raw):
@@ -66,19 +62,9 @@ class CodeString:
         return self.raw
 
 
-if sys.version_info[0] > 2:
-
-    def clean(string):
-        string = string.replace("\u03BB", "lambda")
-        return string
-
-
-else:
-
-    def clean(string):
-        """ Removes non-ascii characters from a string """
-        string = string.replace(u"\u03BB", "lambda")
-        return string.encode("ascii", "replace")
+def clean(string):
+    string = string.replace("\u03BB", "lambda")
+    return string
 
 
 class _StartupFile:
@@ -133,42 +119,26 @@ class FoxDotCode:
 
     def __call__(self, code, verbose=True, verbose_error=None):
         """ Takes a string of FoxDot code and executes as Python """
-
         if self.namespace["_Clock"].waiting_for_sync:
-
             time.sleep(0.25)
             return self.__call__(code, verbose, verbose_error)
 
         if verbose_error is None:
-
             verbose_error = verbose
-
         if not code:
-
             return
 
         try:
-
             if type(code) != CodeType:
-
                 code = clean(code)
-
                 response = stdout(code)
-
                 if verbose is True:
-
                     print(response)
-
             exec(self._compile(code), self.namespace)
-
         except Exception as e:
-
             response = error_stack()
-
             if verbose_error is True:
-
                 print(response)
-
         return response
 
     def update_line_numbers(self, text_widget, start="1.0", end="end", remove=0):
@@ -178,37 +148,28 @@ class FoxDotCode:
         offset = int(start.split(".")[0])
 
         for i, line in enumerate(lines):
-
             # Check line for a player and assign it a line number
             match = re_player.match(line)
             line_changed = False
 
             if match is not None:
-
                 whitespace = len(match.group(1))
                 player = match.group(2)
                 line = i + offset
 
                 if player in self.player_line_numbers:
-
                     if (line, whitespace) != self.player_line_numbers[player]:
-
                         line_changed = True
 
                 if line_changed or player not in self.player_line_numbers:
-
                     self.player_line_numbers[player] = (line, whitespace)
                     update.append("{}.id = '{}'".format(player, player))
                     update.append("{}.line_number = {}".format(player, line))
                     update.append("{}.whitespace  = {}".format(player, whitespace))
 
         # Execute updates if necessary
-
         if len(update) > 0:
-
             self.__call__("\n".join(update), verbose=False)
-
-        return
 
 
 execute = FoxDotCode()  # this is not well named
@@ -225,32 +186,21 @@ def get_input():
     text = []
 
     while len(line) > 0:
-
         line = input("")
         text.append(line)
-
     return "\n".join(text)
 
 
 def handle_stdin():
     """ When FoxDot is run with the --pipe added, this function
         is called and continuosly   """
-
     load_startup_file()
-
     while True:
-
         try:
-
             text = get_input()
-
             execute(text, verbose=False, verbose_error=True)
-
         except (EOFError, KeyboardInterrupt):
-
             sys.exit("Quitting")
-
-    return
 
 
 def stdout(code):
@@ -274,8 +224,6 @@ def WarningMsg(*text):
 
 # These functions return information about an imported module
 # Should use insepct module
-
-
 def classes(module):
     """ Returns a list of class names defined in module """
     return [name for name, data in vars(module).items() if type(data) == TypeType]

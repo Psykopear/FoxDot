@@ -157,33 +157,21 @@ Original Comments
 >     Added a generic callback handler.
 >     - dwh
 """
-from __future__ import print_function
-
 import math, re, socket, select, string, struct, sys, threading, time, types, array, errno, inspect
 
-if sys.version_info[0] > 2:
-    long = int
-    from socketserver import (
-        UDPServer,
-        DatagramRequestHandler,
-        ThreadingMixIn,
-        StreamRequestHandler,
-        TCPServer,
-    )
+long = int
+from socketserver import (
+    UDPServer,
+    DatagramRequestHandler,
+    ThreadingMixIn,
+    StreamRequestHandler,
+    TCPServer,
+)
 
-    try:
-        from socketserver import ForkingMixIn
-    except ImportError:
-        ForkingMixIn = ThreadingMixIn
-else:
-    from SocketServer import (
-        UDPServer,
-        DatagramRequestHandler,
-        ForkingMixIn,
-        ThreadingMixIn,
-        StreamRequestHandler,
-        TCPServer,
-    )
+try:
+    from socketserver import ForkingMixIn
+except ImportError:
+    ForkingMixIn = ThreadingMixIn
 
 from contextlib import closing
 
@@ -749,12 +737,9 @@ class OSCBundle(OSCMessage):
 def OSCString(next):
     """Convert a string into a zero-padded OSC String.
     The length of the resulting string is always a multiple of 4 bytes.
-    The string ends with 1 to 4 zero-bytes ('\x00') 
+    The string ends with 1 to 4 zero-bytes ('\x00')
     """
-    if sys.version_info[0] > 2:
-        next = bytes(next.encode("UTF-8"))  # this could be the problem?
-    else:
-        next = str(next)
+    next = bytes(next.encode("UTF-8"))
     OSCstringLength = math.ceil((len(next) + 1) / 4.0) * 4
     return struct.pack(">%ds" % (OSCstringLength), next)
 
@@ -762,8 +747,8 @@ def OSCString(next):
 def OSCBlob(next):
     """Convert a string into an OSC Blob.
     An OSC-Blob is a binary encoded block of data, prepended by a 'size' (int32).
-    The size is always a mutiple of 4 bytes. 
-    The blob ends with 0 to 3 zero-bytes ('\x00') 
+    The size is always a mutiple of 4 bytes.
+    The blob ends with 0 to 3 zero-bytes ('\x00')
     """
 
     if type(next) in (bytes, str):
@@ -1381,10 +1366,7 @@ def getFilterStr(filters):
 
 
 # A translation-table for mapping OSC-address expressions to Python 're' expressions
-if sys.version_info[0] > 2:
-    OSCtrans = str.maketrans("{,}?", "(|).")
-else:
-    OSCtrans = string.maketrans("{,}?", "(|).")
+OSCtrans = str.maketrans("{,}?", "(|).")
 
 
 def getRegEx(pattern):

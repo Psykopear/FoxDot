@@ -18,7 +18,7 @@ Other than this, there are things I want to to that could be merged into the mai
 - Remove python2 compatibility layer, since python2 is going to die [very soon](https://pythonclock.org) and the code adds complexity I don't want to deal with
 
 ## Ideas
-I think I will extract FoxDot as a standalone library, separated from both the GUI and the sclang code generation process (these two can be two projects on their own)
+I think I will extract FoxDot as a standalone library, separated from both the GUI and the sclang code generation process (these two can be two projects on their own).
 
 
 ## Changes
@@ -28,6 +28,7 @@ I think I will extract FoxDot as a standalone library, separated from both the G
 - Start supercollider on `from FoxDot import *`. This was mostly implemented already, but not working correctly on Linux, so I just fixed it
 - Removed what seems an unnecessary `__init__.py` in the root folder
 - Removed Workspace directory and references
+- Load all synths and effects from files, instead of writing to file using python first, and then load the file
 
 ## Todo
 - [x] Format code with Black
