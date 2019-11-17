@@ -45,27 +45,24 @@
         Clock.meter = (3,4)
 
 """
-
-from __future__ import absolute_import, division, print_function
-
-from types import FunctionType, MethodType
-
-from .Players import Player
-from .Repeat import MethodCall
-from .Patterns import asStream
-from .TimeVar import TimeVar
-from .Midi import MidiIn, MIDIDeviceNotFound
-from .Utils import modi
-from .ServerManager import TempoClient, ServerManager, RequestTimeout
-from .Settings import CPU_USAGE, CLOCK_LATENCY
-
-import time
-from fractions import Fraction
-from traceback import format_exc as error_stack
-
+import inspect
 import sys
 import threading
-import inspect
+import time
+
+from fractions import Fraction
+from traceback import format_exc as error_stack
+from types import FunctionType, MethodType
+
+from . import Code
+from .Midi import MidiIn, MIDIDeviceNotFound
+from .Patterns import asStream
+from .Players import Player
+from .Repeat import MethodCall
+from .ServerManager import TempoClient, ServerManager, RequestTimeout
+from .Settings import CPU_USAGE, CLOCK_LATENCY
+from .TimeVar import TimeVar
+from .Utils import modi
 
 
 class TempoClock(object):
@@ -80,17 +77,14 @@ class TempoClock(object):
         self.__setup = False
 
         # debug information
-
         self.largest_sleep_time = 0
         self.last_block_dur = 0.0
 
         # Storing time as a float
-
         self.dtype = float
 
         self.beat = self.dtype(0)  # Beats elapsed
         self.last_now_call = self.dtype(0)
-
         self.ticking = True  # ??
 
         # Player Objects stored here
@@ -122,11 +116,11 @@ class TempoClock(object):
         # Can be configured
         self.latency_values = [0.25, 0.5, 0.75]
         self.latency = (
-            0.25
-        )  # Time between starting processing osc messages and sending to server
+            0.25  # Time between starting processing osc messages and sending to server
+        )
         self.nudge = (
-            0.0
-        )  # If you want to synchronise with something external, adjust the nudge
+            0.0  # If you want to synchronise with something external, adjust the nudge
+        )
         self.hard_nudge = 0.0
 
         self.bpm_start_time = time.time()
@@ -262,13 +256,9 @@ class TempoClock(object):
 
     def update_tempo(self, bpm):
         """ Schedules the bpm change at the next bar, returns the beat and start time of the next change """
-
         try:
-
             assert bpm > 0, "Tempo must be a positive number"
-
         except AssertionError as err:
-
             raise (ValueError(err))
 
         next_bar = self.next_bar()
@@ -277,13 +267,9 @@ class TempoClock(object):
         bpm_start_beat = next_bar
 
         def func():
-
             if self.espgrid is not None:
-
                 self.espgrid.set_tempo(bpm)
-
             else:
-
                 object.__setattr__(self, "bpm", self._convert_json_bpm(bpm))
                 self.last_now_call = self.bpm_start_time = bpm_start_time
                 self.bpm_start_beat = bpm_start_beat
@@ -307,93 +293,49 @@ class TempoClock(object):
 
         # Might be changing immediately
         if schedule_now:
-
             func()
-
         else:
-
             self.schedule(func, is_priority=True)
-
-        return
 
     def update_network_tempo(self, bpm, start_beat, start_time):
         """ Updates connected FoxDot instances (client or servers) tempi """
-
         json_value = self._convert_bpm_json(bpm)
-
         # If this is a client, send info to server
-
         if self.tempo_client is not None:
-
             self.tempo_client.update_tempo(json_value, start_beat, start_time)
 
         # If this is a server, send info to clients
-
         if self.tempo_server is not None:
-
             self.tempo_server.update_tempo(None, json_value, start_beat, start_time)
-
-        return
 
     def swing(self, amount=0.1):
         """ Sets the nudge attribute to var([0, amount * (self.bpm / 120)],1/2)"""
         self.nudge = (
             TimeVar([0, amount * (self.bpm / 120)], 1 / 2) if amount != 0 else 0
         )
-        return
 
     def set_cpu_usage(self, value):
         """ Sets the `sleep_time` attribute to values based on desired high/low/medium cpu usage """
         assert 0 <= value <= 2
         self.sleep_time = self.sleep_values[value]
-        return
 
     def set_latency(self, value):
         """ Sets the `latency` attribute to values based on desired high/low/medium latency """
         assert 0 <= value <= 2
         self.latency = self.latency_values[value]
-        return
 
     def __setattr__(self, attr, value):
         if attr == "bpm" and self.__setup:
-
-            # If connected to EspGrid, just update that
-
-            # if self.espgrid is not None:
-
-            #     self.espgrid.set_tempo(value)
-
-            # else:
-
-            #     # Schedule for next bar
-
-            #     start_beat, start_time = self.update_tempo(value)
-
-            #     # Checks if any peers are connected and updates them also
-
-            #     self.update_network_tempo(value, start_beat, start_time)
-
             # Schedule for next bar
-
             start_beat, start_time = self.update_tempo(value)
-
             # Checks if any peers are connected and updates them also
-
             self.update_network_tempo(value, start_beat, start_time)
-
         elif attr == "midi_nudge" and self.__setup:
-
             # Adjust nudge for midi devices
-
             self.server.set_midi_nudge(value)
-
             object.__setattr__(self, "midi_nudge", value)
-
         else:
-
             self.__dict__[attr] = value
-
-        return
 
     def bar_length(self):
         """ Returns the length of a bar in terms of beats """
@@ -405,7 +347,6 @@ class TempoClock(object):
 
     def beat_dur(self, n=1):
         """ Returns the length of n beats in seconds """
-
         return 0 if n == 0 else (60.0 / self.get_bpm()) * n
 
     def beats_to_seconds(self, beats):
@@ -554,17 +495,11 @@ class TempoClock(object):
         expected_beat = self.get_elapsed_beats_from_last_bpm_change()
 
         # Dont adjust nudge on first bar of tempo change
-
         if beats_elapsed > 0:
-
             # Account for nudge in the drift
-
             self.drift = self.beat_dur(expected_beat - beats_elapsed) - self.nudge
-
             if abs(self.drift) > 0.001:  # value could be reworked / not hard coded
-
                 self.hard_nudge -= self.drift
-
         return self._schedule_adjust_hard_nudge()
 
     def _schedule_adjust_hard_nudge(self):
@@ -580,121 +515,64 @@ class TempoClock(object):
 
         # `beat` is the actual beat this is happening, `block.beat` is the desired time. Adjust
         # the osc_message_time accordingly if this is being called late
-
         block.time = self.osc_message_time() - self.beat_dur(float(beat) - block.beat)
-
         for item in block:
-
             # The item might get called by another item in the queue block
-
             output = None
-
             if item.called is False:
-
                 try:
-
                     output = item.__call__()
-
                 except SystemExit:
-
                     sys.exit()
-
                 except:
-
                     print(error_stack())
-
                 # TODO: Get OSC message from the call, and add to list?
-
         # Send all the message to supercollider together
-
         block.send_osc_messages()
-
-        # Store the osc messages -- future idea
-
-        # self.history.add(block.beat, block.osc_messages)
-
-        return
 
     def run(self):
         """ Main loop """
-
         self.ticking = True
-
         self.polled = False
 
         while self.ticking:
-
             beat = self._now()  # get current time
-
             if self.queue.after_next_event(beat):
-
                 self.current_block = self.queue.pop()
-
                 # Do the work in a thread
-
                 if len(self.current_block):
-
                     threading.Thread(
                         target=self.__run_block, args=(self.current_block, beat)
                     ).start()
 
-            # If using a midi-clock, update the values
-
-            # if self.midi_clock is not None:
-
-            # self.midi_clock.update()
-
-            # if using espgrid
-
             if self.sleep_time > 0:
-
                 time.sleep(self.sleep_time)
-
-        return
 
     def schedule(self, obj, beat=None, args=(), kwargs={}, is_priority=False):
         """ TempoClock.schedule(callable, beat=None)
             Add a player / event to the queue """
-
         # Make sure the object can actually be called
-
         try:
-
             assert callable(obj)
-
         except AssertionError:
-
             raise ScheduleError(obj)
 
         # Start the clock ticking if not already
-
         if self.ticking == False:
-
             self.start()
 
         # Default is next bar
-
         if beat is None:
-
             beat = self.next_bar()
 
         # Keep track of objects in the Clock
-
         if obj not in self.playing and isinstance(obj, Player):
-
             self.playing.append(obj)
-
         if obj not in self.items:
-
             self.items.append(obj)
 
         # Add to the queue
-
         self.queue.add(obj, beat, args, kwargs, is_priority)
-
-        # block.time = self.osc_message_accum
-
-        return
 
     def future(self, dur, obj, args=(), kwargs={}):
         """ Add a player / event to the queue `dur` beats in the future """
@@ -718,7 +596,6 @@ class TempoClock(object):
         return [p for p in self.playing if p not in exclude]
 
     # Every n beats, do...
-
     def every(self, n, cmd, args=()):
         def event(f, n, args):
             f(*args)
@@ -726,19 +603,16 @@ class TempoClock(object):
             return
 
         self.schedule(event, self.now() + n, args=(cmd, n, args))
-        return
 
     def stop(self):
         self.ticking = False
         self.kill_tempo_server()
         self.kill_tempo_client()
         self.clear()
-        return
 
     def shift(self, n):
         """ Offset the clock time """
         self.beat += n
-        return
 
     def clear(self):
         """ Remove players from clock """
@@ -748,22 +622,10 @@ class TempoClock(object):
         self.solo.reset()
 
         for player in list(self.playing):
-
             player.kill()
-
-        # for item in self.items:
-
-        #     if hasattr(item, 'stop'):
-
-        #         item.stop()
-
         self.playing = []
-
         if self.espgrid is not None:
-
             self.schedule(self._espgrid_update_tempo)
-
-        return
 
 
 #####
@@ -783,85 +645,51 @@ class Queue(object):
         """ Adds a callable object to the queue at a specified beat, args and kwargs for the
             callable object must be in a list and dict.
         """
-
         # item must be callable to be schedule, so check args and kwargs are appropriate for it
-
         try:
-
             function = inspect.getargspec(item)
-
         except TypeError:
-
             function = inspect.getargspec(item.__call__)
 
         # If the item can't take arbitrary keywords, check any kwargs are valid
-
         if function.keywords is None:
-
             for key in list(kwargs.keys()):
-
                 if key not in function.args:
-
                     del kwargs[key]
 
         # If the new event is before the next scheduled event,
         # move it to the 'front' of the queue
-
         if self.before_next_event(beat):
-
             self.data.append(QueueBlock(self, item, beat, args, kwargs, is_priority))
-
             block = self.data[-1]
-
         else:
-
             # If the event is after the next scheduled event, work
             # out its position in the queue
-
             # need to be careful in case self.data changes size
-
             for block in self.data:
-
                 # If another event is happening at the same time, schedule together
-
                 if beat == block.beat:
-
                     block.add(item, args, kwargs, is_priority)
-
                     break
-
                 # If the event is later than the next event, schedule it here
-
                 if beat > block.beat:
-
                     try:
-
                         i = self.data.index(block)
-
                     except ValueError:
-
                         i = 0
-
                     self.data.insert(
                         i, QueueBlock(self, item, beat, args, kwargs, is_priority)
                     )
-
                     block = self.data[i]
-
                     break
 
         # Tell any players about what queue item they are in
-
         if isinstance(item, Player):
-
             item.set_queue_block(block)
-
-        return
 
     def clear(self):
         while len(self.data):
             del self.data[-1]
-        return
 
     def pop(self):
         return self.data.pop() if len(self.data) > 0 else list()
@@ -892,9 +720,6 @@ class Queue(object):
 
     def get_clock(self):
         return self.parent
-
-
-from types import FunctionType
 
 
 class QueueBlock(object):
@@ -938,29 +763,18 @@ class QueueBlock(object):
 
     def add(self, obj, args=(), kwargs={}, is_priority=False):
         """ Adds a callable object to the QueueBlock """
-
         q_obj = QueueObj(obj, args, kwargs)
-
         for i, in_level in enumerate(self.priority_levels):
-
             if in_level(obj):
-
                 # Put at the front if labelled as priority
-
                 if is_priority:
-
                     self.events[i].insert(0, q_obj)
-
                 else:
-
                     self.events[i].append(q_obj)
-
                 self.items[
                     q_obj.obj
                 ] = q_obj  # store the wrapped object as an identifer
-
                 break
-        return
 
     def __call__(self):
         """ Calls self.osc_messages() """
@@ -970,7 +784,6 @@ class QueueBlock(object):
         """ Adds an OSC bundle if the timetag is not in the past """
         if message.timetag > self.metro.get_time():
             self.osc_messages.append(message)
-        return
 
     def send_osc_messages(self):
         """ Sends all compiled osc messages to the SuperCollider server """
@@ -1034,9 +847,6 @@ class History(object):
 
     def add(self, beat, osc_messages):
         self.data.append(osc_messages)
-
-
-from . import Code
 
 
 class Wrapper(Code.LiveObject):

@@ -24,11 +24,8 @@ def freqtomidi(freq):
 
 def midi(scale, octave, degree, root=0, stepsPerOctave=12):
     """ Calculates a midinote from a scale, octave, degree, and root """
-
     # Make sure we force timevars into real values
-
     if isinstance(scale, ScalePattern) and isinstance(scale.data, TimeVar):
-
         scale = asStream(scale.data.now())
 
     # Force float
@@ -44,15 +41,11 @@ def midi(scale, octave, degree, root=0, stepsPerOctave=12):
     index = lo % len(scale)
 
     # Work out any microtones
-
     micro = degree - lo
 
     if micro > 0:
-
         ex_scale = list(scale) + [stepsPerOctave]
-
         diff = ex_scale[index + 1] - scale[index]
-
         micro = micro * diff
 
     midival = stepsPerOctave * octave  # Root note of scale
@@ -65,18 +58,12 @@ def midi(scale, octave, degree, root=0, stepsPerOctave=12):
 
 def get_freq_and_midi(degree, octave, root, scale):
     """ Returns the frequency and midinote """
-
     # TODO -- make sure it's always a scale
-
     if isinstance(scale, ScaleType):
-
         freq, midinote = scale.get_freq(degree, octave, root, get_midi=True)
-
     else:
-
         midinote = midi(scale, octave, degree, root)
         freq = miditofreq(midinote)
-
     return freq, midinote
 
 
@@ -114,29 +101,21 @@ class Tuning:
 
 
 class ScalePattern(ScaleType, Pattern):
-
     name = None
 
     def __init__(self, semitones, name=None, tuning=Tuning.ET12):
-
         self.name = name
-
         self.semitones = semitones.data if isinstance(semitones, Pattern) else semitones
 
         if not isinstance(tuning, TuningType):
-
             self.tuning = TuningType(tuning)
-
         else:
-
             self.tuning = tuning
 
         self.data = self.semitones
-
         self.steps = self.tuning.steps
 
         if self.steps:
-
             self.pentatonic = PentatonicScalePattern(self)
 
     def __eq__(self, other):
@@ -161,11 +140,8 @@ class ScalePattern(ScaleType, Pattern):
 
     def get_midi_note(self, degree, octave=5, root=0):
         """ Calculates a midinote from a scale, octave, degree, and root """
-
         # Make sure we force timevars into real values
-
         if isinstance(self.data, TimeVar):
-
             scale = asStream(self.data.now())
 
         # Force float
@@ -183,15 +159,11 @@ class ScalePattern(ScaleType, Pattern):
         pitch = self.get_tuned_note(index)
 
         # Work out any microtones
-
         micro = degree - lo
 
         if micro > 0:
-
             ex_scale = list(self) + [self.steps]
-
             diff = ex_scale[index + 1] - self[index]
-
             micro = micro * diff
 
         midival = self.steps * octave  # Root note of scale
@@ -217,7 +189,7 @@ class ScalePattern(ScaleType, Pattern):
         return asStream(self.data)[i] + n
 
     def getslice(self, start, stop, step=1):
-        """ Called when using __getitem__ with slice notation. Numbers 
+        """ Called when using __getitem__ with slice notation. Numbers
             smaller than 0 and greater than the max value are adjusted. """
 
         start = start if start is not None else 0
@@ -225,35 +197,22 @@ class ScalePattern(ScaleType, Pattern):
         step = step if step is not None else 1
 
         if stop < start:
-
             stop = len(self.data) + stop
 
         semitones = []
 
         for i in range(start, stop, step):
-
             # Get the semitone
-
             tone = self[i]
-
             # Negative values
-
             if i < 0:
-
                 sub = ((abs(i) // len(self)) + 1) * self.steps
-
                 tone -= sub
-
             # Values past the end
-
             elif i >= len(self):
-
                 add = (i // len(self)) * self.steps
-
                 tone += add
-
             semitones.append(tone)
-
         return ScalePattern(semitones)
 
     # def semitone_to_note(self, semitone):
@@ -263,7 +222,6 @@ class ScalePattern(ScaleType, Pattern):
 
 class PentatonicScalePattern(ScalePattern):
     def __init__(self, scale):
-
         self.update(scale)
 
     def update(self, scale):
@@ -278,9 +236,7 @@ class PentatonicScalePattern(ScalePattern):
 
     @staticmethod
     def values(scale):
-
         shift = ((scale[2] - scale[0]) % 2) * 2
-
         return sorted([scale[(i + shift) % len(scale)] for i in range(0, 5 * 4, 4)])
 
     def __str__(self):
@@ -290,9 +246,7 @@ class PentatonicScalePattern(ScalePattern):
         return str(self)
 
     def __iter__(self):
-
         for note in self.values(self.data):
-
             yield note
 
     def __getitem__(self, key):
@@ -341,33 +295,19 @@ class _DefaultScale(ScaleType):
 
     def set(self, new, *args, **kwargs):
         """ Change the contents of the default scale """
-
         if type(new) == str:
-
             self.scale = Scale.get_scale(new)
-
             if "tuning" in kwargs:
-
                 self.scale.tuning = kwargs["tuning"]
-
             self.pentatonic.update(self.scale.pentatonic)
-
         elif isinstance(new, (list, Pattern, TimeVar)):
-
             self.scale = ScalePattern(new, *args, **kwargs)
-
             # Store if the user has used a name
-
             if self.scale.name is not None and self.scale.name not in Scale.names():
-
                 Scale[self.scale.name] = self.scale
-
             self.pentatonic.update(self.scale.pentatonic)
-
         else:
-
             print("Warning: {!r} is not a valid scale".format(new))
-
         return self
 
     def __getattribute__(self, attr):
@@ -487,7 +427,6 @@ class __scale__:
     freq = FreqScalePattern()
 
     def __init__(self):
-
         self.default = _DefaultScale(self.major)
 
     def __setattr__(self, key, value):

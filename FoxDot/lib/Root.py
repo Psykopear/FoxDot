@@ -27,9 +27,7 @@ class Note:
         return int(self.num)
 
     def set(self, index):
-
         if type(index) is str:
-
             char = index.title()
 
             if len(char) == 1:
@@ -45,17 +43,14 @@ class Note:
             self.num = (CHROMATIC_NOTES.index(char[0]) + mod) % len(CHROMATIC_NOTES)
 
         if type(index) is int:
-
             self.num = index
             self.char = modi(CHROMATIC_NOTES, index)
 
         if type(index) is float:
-
             self.num = index
             self.char = "<Micro-Tuned>"
 
         if isinstance(index, TimeVar):
-
             self.num = index
             self.char = "<Time-Varying>"
 
@@ -78,11 +73,8 @@ class Note:
         return other - self.num
 
     def __call__(self, *args):
-
         if len(args) > 0:
-
             self.set(args[0])
-
         return self
 
 
