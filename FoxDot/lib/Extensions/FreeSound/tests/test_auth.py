@@ -1,6 +1,6 @@
 from unittest import mock
 
-from ..auth import open_browser, webbrowser, CLIENT_ID, authenticate
+from ..auth import open_browser, webbrowser, CLIENT_ID
 
 
 def test_open_browser_works():
@@ -12,6 +12,3 @@ def test_open_browser_works():
         Mock.assert_called_once_with(
             'https://freesound.org/apiv2/oauth2/authorize/'\
             '?client_id=%s&response_type=code&state=xyz' % CLIENT_ID)
-
-def test_authenticate():
-    authenticate()
